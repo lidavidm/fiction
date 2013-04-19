@@ -163,9 +163,14 @@ public class PlaylistActivity extends Activity
 		switch (view.getId()) {
 		case R.id.edit:
 			setEditing(!mEditing);
+            mAdapter.notifyDataSetChanged();
 			break;
 		case R.id.delete: {
             if (mEditing) {
+                Intent launch = new Intent(this, PickerActivity.class);
+                launch.putExtra("playlist", mPlaylistId);
+                launch.putExtra("playlistName", mPlaylistName);
+                startActivity(launch);
             }
             else {
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);

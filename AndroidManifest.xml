@@ -55,6 +55,11 @@ THE SOFTWARE.
 			android:launchMode="singleTask"
 			android:theme="@style/BackActionBar" />
 		<activity
+			android:name="PickerActivity"
+			android:launchMode="singleTask"
+			android:theme="@style/Library"
+			android:uiOptions="splitActionBarWhenNarrow" />
+		<activity
 			android:name="MiniPlaybackActivity"
 			android:theme="@style/Dialog"
 			android:excludeFromRecents="true"

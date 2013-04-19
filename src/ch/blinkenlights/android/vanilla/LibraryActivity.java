@@ -125,7 +125,7 @@ public class LibraryActivity
 	private TextView mTextFilter;
 	private View mClearButton;
 
-	private View mActionControls;
+	protected View mActionControls;
 	private View mControls;
 	private TextView mTitle;
 	private TextView mArtist;
@@ -707,7 +707,7 @@ public class LibraryActivity
 	 * @param intent An intent created with
 	 * {@link LibraryAdapter#createData(View)}.
 	 */
-	private void addToPlaylist(long playlistId, Intent intent)
+	protected void addToPlaylist(long playlistId, Intent intent)
 	{
 		QueryTask query = buildQueryFromIntent(intent, true, false);
 		int count = Playlist.addToPlaylist(getContentResolver(), playlistId, query);
