@@ -69,6 +69,7 @@ THE SOFTWARE.
 	<string name="new_playlist">New Playlist…</string>
 	<string name="expand">Expand</string>
 	<string name="delete">Delete</string>
+	<string name="add">Add</string>
 	<string name="playback_view">Now Playing</string>
 	<string name="sort_by">Sort By</string>
 	<string name="search">Search</string>
@@ -162,7 +163,7 @@ THE SOFTWARE.
 	<string name="replaygain_album_summary">Preserve album dynamics</string>
 	<string name="replaygain_silence_title">Keep volume down</string>
 	<string name="replaygain_silence_summary">Automatically reduce the volume by 30% for tracks without any Replay Gain information</string>
-	
+
 	<string name="notifications">Notifications</string>
 	<string name="notification_mode_title">Notification Mode</string>
 	<string name="notification_action_title">Notification Action</string>

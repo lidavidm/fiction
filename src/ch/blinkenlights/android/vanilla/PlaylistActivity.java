@@ -152,8 +152,7 @@ public class PlaylistActivity extends Activity
 	{
 		mListView.setEditable(editing);
 		mAdapter.setEditable(editing);
-		int visible = editing ? View.GONE : View.VISIBLE;
-		mDeleteButton.setVisibility(visible);
+        mDeleteButton.setText(editing ? R.string.add : R.string.delete);
 		mEditButton.setText(editing ? R.string.done : R.string.edit);
 		mEditing = editing;
 	}
@@ -166,12 +165,16 @@ public class PlaylistActivity extends Activity
 			setEditing(!mEditing);
 			break;
 		case R.id.delete: {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			String message = getResources().getString(R.string.delete_playlist, mPlaylistName);
-			builder.setMessage(message);
-			builder.setPositiveButton(R.string.delete, this);
-			builder.setNegativeButton(R.string.cancel, this);
-			builder.show();
+            if (mEditing) {
+            }
+            else {
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                String message = getResources().getString(R.string.delete_playlist, mPlaylistName);
+                builder.setMessage(message);
+                builder.setPositiveButton(R.string.delete, this);
+                builder.setNegativeButton(R.string.cancel, this);
+                builder.show();
+            }
 			break;
 		}
 		}
