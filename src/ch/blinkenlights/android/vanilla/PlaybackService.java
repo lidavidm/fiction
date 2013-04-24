@@ -99,7 +99,7 @@ public final class PlaybackService extends Service
 	 * Rewind song if we already played more than 2.5 sec
 	*/
 	private static final int REWIND_AFTER_PLAYED_MS = 2500;
-	
+
 	/**
 	 * Action for startService: toggle playback on/off.
 	 */
@@ -371,9 +371,9 @@ public final class PlaybackService extends Service
 	private boolean mReplayGainAlbumEnabled;
 	private int mReplayGainBump;
 	private int mReplayGainUntaggedDeBump;
-	
+
 	private BastpUtil mBastpUtil;
-	
+
 	@Override
 	public void onCreate()
 	{
@@ -386,7 +386,7 @@ public final class PlaybackService extends Service
 
 		mMediaPlayer = getNewMediaPlayer();
 		mBastpUtil = new BastpUtil();
-		
+
 		mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
 
@@ -411,7 +411,7 @@ public final class PlaybackService extends Service
 		mReplayGainAlbumEnabled = settings.getBoolean(PrefKeys.ENABLE_ALBUM_REPLAYGAIN, false);
 		mReplayGainBump = settings.getInt(PrefKeys.REPLAYGAIN_BUMP, 75);  /* seek bar is 150 -> 75 == middle == 0 */
 		mReplayGainUntaggedDeBump = settings.getInt(PrefKeys.REPLAYGAIN_UNTAGGED_DEBUMP, 150); /* seek bar is 150 -> == 0 */
-		
+
 		PowerManager powerManager = (PowerManager)getSystemService(POWER_SERVICE);
 		mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "VanillaMusicLock");
 
@@ -570,21 +570,21 @@ public final class PlaybackService extends Service
 		mp.setOnErrorListener(this);
 		return mp;
 	}
-	
+
 	public void prepareMediaPlayer(MediaPlayer mp, String path) throws IOException{
 		mp.setDataSource(path);
 		mp.prepare();
 		applyReplayGain(mp, path);
 	}
-	
-	
+
+
 	/**
 	 * Make sure that the current ReplayGain volume matches
 	 * the (maybe just changed) user settings
 	*/
 	private void refreshReplayGainValues() {
 		Song curSong = getSong(0);
-		
+
 		if(mMediaPlayer == null)
 			return;
 		if(curSong == null)
@@ -596,22 +596,22 @@ public final class PlaybackService extends Service
 		}
 	}
 
-	
+
 	private void applyReplayGain(MediaPlayer mp, String path) {
-		
+
 		float[] rg = getReplayGainValues(path); /* track, album */
 		float adjust = 0f;
-		
+
 		if(mReplayGainAlbumEnabled) {
 			adjust = (rg[0] != 0 ? rg[0] : adjust); /* do we have track adjustment ? */
 			adjust = (rg[1] != 0 ? rg[1] : adjust); /* ..or, even better, album adj? */
 		}
-		
+
 		if(mReplayGainTrackEnabled || (mReplayGainAlbumEnabled && adjust == 0)) {
 			adjust = (rg[1] != 0 ? rg[1] : adjust); /* do we have album adjustment ? */
 			adjust = (rg[0] != 0 ? rg[0] : adjust); /* ..or, even better, track adj? */
 		}
-		
+
 		if(adjust == 0) {
 			/* No RG value found: decrease volume for untagged song if requested by user */
 			adjust = (mReplayGainUntaggedDeBump-150)/10f;
@@ -621,34 +621,34 @@ public final class PlaybackService extends Service
 			** But we want -15 <-> +15, so 75 shall be zero */
 			adjust += 2*(mReplayGainBump-75)/10f; /* 2* -> we want +-15, not +-7.5 */
 		}
-		
+
 		if(mReplayGainAlbumEnabled == false && mReplayGainTrackEnabled == false) {
 			/* Feature is disabled: Make sure that we are going to 100% volume */
 			adjust = 0f;
 		}
-		
+
 		float rg_result = (float)Math.pow(10, (adjust/20) );
 		mp.setVolume(rg_result, rg_result);
 		Log.d("VanillaMusic", "rg="+rg_result+", adj="+adjust+", pth="+path);
 	}
-	
+
 	public float[] getReplayGainValues(String path) {
 		return mBastpUtil.getReplayGainValues(path);
 	}
-	
+
 	/**
 	 * Destroys any currently prepared MediaPlayer and
 	 * re-creates a newone if needed.
 	 */
 	private void triggerGaplessUpdate() {
 		// Log.d("VanillaMusic", "triggering gapless update");
-		
+
 		if(mMediaPlayerInitialized != true)
 			return;
-		
+
 		if(Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN)
 			return; /* setNextMediaPlayer is supported since JB */
-		
+
 		if(mPreparedMediaPlayer != null) {
 			/* an old prepared player exists and is
 			 * most likely invalid -> destroy it now
@@ -658,7 +658,7 @@ public final class PlaybackService extends Service
 			mPreparedMediaPlayer = null;
 			// Log.d("VanillaMusic", "old prepared player destroyed");
 		}
-		
+
 		int fa = finishAction(mState);
 		Song nextSong = getSong(1);
 		if( nextSong != null
@@ -677,9 +677,9 @@ public final class PlaybackService extends Service
 		else {
 			Log.d("VanillaMusic", "Must not create new media player object");
 		}
-		
+
 	}
-	
+
 	/**
 	 * Return the SharedPreferences instance containing the PlaybackService
 	 * settings, creating it if necessary.
@@ -884,7 +884,7 @@ public final class PlaybackService extends Service
 			mTimeline.setShuffleMode(shuffleMode(state));
 		if ((toggled & MASK_FINISH) != 0)
 			mTimeline.setFinishAction(finishAction(state));
-		
+
 		triggerGaplessUpdate();
 	}
 
@@ -1140,10 +1140,10 @@ public final class PlaybackService extends Service
 		try {
 			mMediaPlayerInitialized = false;
 			mMediaPlayer.reset();
-			
+
 			if(mPreparedMediaPlayer != null &&
 			   mPreparedMediaPlayer.isPlaying()) {
-				
+
 				mMediaPlayer.release();
 				mMediaPlayer = mPreparedMediaPlayer;
 				mPreparedMediaPlayer = null;
@@ -1151,10 +1151,10 @@ public final class PlaybackService extends Service
 			else {
 				prepareMediaPlayer(mMediaPlayer, song.path);
 			}
-			
+
 			mMediaPlayerInitialized = true;
 			triggerGaplessUpdate();
-			
+
 			if (mPendingSeek != 0 && mPendingSeekSong == song.id) {
 				mMediaPlayer.seekTo(mPendingSeek);
 				mPendingSeek = 0;
@@ -1543,7 +1543,7 @@ public final class PlaybackService extends Service
 		default:
 			throw new IllegalArgumentException("Invalid add mode: " + query.mode);
 		}
-		
+
 		Toast.makeText(this, getResources().getQuantityString(text, count, count), Toast.LENGTH_SHORT).show();
 		triggerGaplessUpdate();
 	}
@@ -1978,10 +1978,7 @@ public final class PlaybackService extends Service
 			Toast.makeText(this, R.string.queue_cleared, Toast.LENGTH_SHORT).show();
 			break;
 		case ShowQueue:
-			Intent intentShowQueue = new Intent(this, ShowQueueActivity.class);
-			intentShowQueue.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-			startActivity(intentShowQueue);
-			break;
+			throw new IllegalArgumentException("Invalid (deprecated) action: " + action);
 		case ToggleControls:
 			// Handled in FullPlaybackActivity.performAction
 			break;
@@ -2005,14 +2002,14 @@ public final class PlaybackService extends Service
 	{
 		return mTimeline.getLength();
 	}
-	
+
 	/**
 	 * Returns 'Song' with given id from timeline
 	*/
 	public Song getSongByQueuePosition(int id) {
 		return mTimeline.getSongByQueuePosition(id);
 	}
-	
+
 	/**
 	 * Do a 'hard' jump to given queue position
 	*/
@@ -2021,5 +2018,5 @@ public final class PlaybackService extends Service
 		setCurrentSong(0);
 		play();
 	}
-	
+
 }

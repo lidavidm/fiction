@@ -42,15 +42,22 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
+
+import com.slidingmenu.lib.SlidingMenu;
+import com.slidingmenu.lib.app.SlidingActivity;
 
 /**
  * Base activity for activities that contain playback controls. Handles
  * communication with the PlaybackService and response to state and song
  * changes.
  */
-public abstract class PlaybackActivity extends Activity
+public abstract class PlaybackActivity extends SlidingActivity
 	implements Handler.Callback,
 	           View.OnClickListener,
 	           CoverView.Callback
@@ -81,6 +88,9 @@ public abstract class PlaybackActivity extends Activity
 	private long mLastStateEvent;
 	private long mLastSongEvent;
 
+	private ListView mListView;
+	private ShowQueueAdapter listAdapter;
+
 	@Override
 	public void onCreate(Bundle state)
 	{
@@ -95,6 +105,66 @@ public abstract class PlaybackActivity extends Activity
 
 		mLooper = thread.getLooper();
 		mHandler = new Handler(mLooper, this);
+
+        // setTitle(R.string.queue);
+        setBehindContentView(R.layout.showqueue_listview);
+        SlidingMenu menu = getSlidingMenu();
+        menu.setBehindOffset(100);
+        menu.setFadeDegree(0.35f);
+        menu.setFadeEnabled(true);
+
+        setSlidingActionBarEnabled(false);
+        menu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+            @Override
+            public void onOpen() {
+                refreshSongQueueList();
+            }
+            });
+
+		mListView   = (ListView) findViewById(R.id.list);
+		listAdapter = new ShowQueueAdapter(this, R.layout.showqueue_row);
+		mListView.setAdapter(listAdapter);
+
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    jumpToSong(position);
+                    getSlidingMenu().showContent();
+                }});
+		mListView.setOnItemLongClickListener(new OnItemLongClickListener() {
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    jumpToSong(position);
+                    /* This activity will stay open on longpress, so we have
+                     * to update the playmerker ourselves */
+                    listAdapter.highlightRow(position);
+                    listAdapter.notifyDataSetChanged();
+                    return true;
+                }});
+	}
+
+	/*
+	** Tells the playback service to jump to a specific song
+	*/
+	private void jumpToSong(int id) {
+		PlaybackService service = PlaybackService.get(this);
+		service.jumpToQueuePosition(id);
+	}
+
+	private void refreshSongQueueList() {
+		int i, stotal, spos;
+		PlaybackService service = PlaybackService.get(this);
+
+		stotal = service.getTimelineLength();   /* Total number of songs in queue */
+		spos   = service.getTimelinePosition(); /* Current position in queue      */
+
+		listAdapter.clear();                    /* Flush all existing entries...  */
+		listAdapter.highlightRow(spos);         /* and highlight current position */
+
+		for(i=0 ; i<stotal; i++) {
+			listAdapter.add(service.getSongByQueuePosition(i));
+		}
+		mListView.setSelectionFromTop(spos, 0); /* scroll to currently playing song */
 	}
 
 	@Override
@@ -283,7 +353,7 @@ public abstract class PlaybackActivity extends Activity
 			}
 		});
 	}
-	
+
 	/**
 	 * Called by FileSystem adapter to get the start folder
 	 * for browsing directories
@@ -294,7 +364,7 @@ public abstract class PlaybackActivity extends Activity
 		File fs_start = new File( folder.equals("") ? Environment.getExternalStorageDirectory().getAbsolutePath() : folder );
 		return fs_start;
 	}
-	
+
 	/**
 	 * Called by PlaybackService to update the current song.
 	 */

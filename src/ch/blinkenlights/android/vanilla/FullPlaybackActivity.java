@@ -392,7 +392,7 @@ public class FullPlaybackActivity extends PlaybackActivity
 			ContentResolver resolver = getContentResolver();
 			String plName = getString(R.string.playlist_favorites);
 			long plId = Playlist.getOrCreatePlaylist(resolver, plName);
-			
+
 			if(psvc.getTimelineLength() > 0) {
 				int qpos = psvc.getTimelinePosition();
 				Song song = psvc.getSongByQueuePosition(qpos);
@@ -403,10 +403,10 @@ public class FullPlaybackActivity extends PlaybackActivity
 					Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 				}
 			}
-			
+
 			break;
 		case MENU_SHOW_QUEUE:
-			startActivity(new Intent(this, ShowQueueActivity.class));
+            getSlidingMenu().showMenu();
 			break;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -540,15 +540,15 @@ public class FullPlaybackActivity extends PlaybackActivity
 		mReplayGain = null;
 		
 		if(song != null) {
-			
+
 			MediaMetadataRetriever data = new MediaMetadataRetriever();
-			
+
 			try {
 				data.setDataSource(song.path);
 			} catch (Exception e) {
 				Log.w("VanillaMusic", "Failed to extract metadata from " + song.path);
 			}
-			
+
 			mGenre = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE);
 			mTrack = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER);
 			String composer = data.extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER);

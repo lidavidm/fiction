@@ -854,6 +854,8 @@ public class LibraryActivity
 		CompatHoneycomb.setShowAsAction(controls, MenuItem.SHOW_AS_ACTION_ALWAYS);
 		MenuItem search = menu.add(0, MENU_SEARCH, 0, R.string.search).setIcon(R.drawable.ic_menu_search);
 		CompatHoneycomb.setShowAsAction(search, MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		MenuItem playpause = menu.add(0, MENU_SEARCH, 0, R.string.play_pause).setIcon(R.drawable.ic_menu_search);
+		CompatHoneycomb.setShowAsAction(playpause, MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		menu.add(0, MENU_SORT, 0, R.string.sort_by).setIcon(R.drawable.ic_menu_sort_alphabetically);
 		return super.onCreateOptionsMenu(menu);
 	}
