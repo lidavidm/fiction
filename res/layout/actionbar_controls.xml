@@ -42,7 +42,6 @@ THE SOFTWARE.
 			android:id="@+id/title"
 			android:textSize="14sp"
 			android:singleLine="true"
-			android:gravity="center_vertical"
 			android:ellipsize="marquee"
 			android:layout_width="fill_parent"
 			android:layout_height="wrap_content" />

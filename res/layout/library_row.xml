@@ -26,5 +26,5 @@ THE SOFTWARE.
 	android:maxLines="2"
 	android:textColor="#ffff"
 	android:gravity="left|center_vertical"
-	android:padding="3dip"
-	android:minHeight="44dip" />
+	android:padding="4dip"
+	android:minHeight="48dip" />

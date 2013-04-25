@@ -20,14 +20,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 -->
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
-	<ch.blinkenlights.android.vanilla.CoverView
-		android:id="@+id/cover_view"
-		android:layout_height="fill_parent"
-		android:layout_width="fill_parent" />
+<!-- <merge xmlns:android="http://schemas.android.com/apk/res/android"> -->
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 	<LinearLayout
 		android:id="@+id/controls_top"
-		android:layout_height="wrap_content"
+        android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:layout_gravity="top"
 		android:background="#a000"
@@ -55,9 +55,14 @@ THE SOFTWARE.
 			android:layout_gravity="center"
 			android:paddingRight="5dip" />
 	</LinearLayout>
+	<ch.blinkenlights.android.vanilla.CoverView
+		android:id="@+id/cover_view"
+        android:layout_height="0dip"
+        android:layout_weight="1"
+		android:layout_width="fill_parent" />
 	<LinearLayout
 		android:id="@+id/controls_bottom"
-		android:layout_height="wrap_content"
+        android:layout_height="wrap_content"
 		android:layout_width="fill_parent"
 		android:layout_gravity="bottom|left"
 		android:layout_margin="0dip"
@@ -65,4 +70,5 @@ THE SOFTWARE.
 		android:orientation="horizontal">
 		<include layout="@layout/controls" />
 	</LinearLayout>
-</merge>
+    </LinearLayout>
+<!-- </merge> -->

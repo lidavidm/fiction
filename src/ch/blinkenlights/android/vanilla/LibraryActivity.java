@@ -211,6 +211,59 @@ public class LibraryActivity
 		}
 
 		loadAlbumIntent(getIntent());
+
+        ((ImageButton) findViewById(R.id.search)).setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getSlidingMenu().showContent();
+                    setSearchBoxVisible(!mSearchBoxVisible);
+                }
+            });
+        ((ImageButton) findViewById(R.id.sort)).setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    MediaAdapter adapter = (MediaAdapter)mCurrentAdapter;
+                    int mode = adapter.getSortMode();
+                    int check;
+                    if (mode < 0) {
+                        check = R.id.descending;
+                        mode = ~mode;
+                    } else {
+                        check = R.id.ascending;
+                    }
+
+                    int[] itemIds = adapter.getSortEntries();
+                    String[] items = new String[itemIds.length];
+                    Resources res = getResources();
+                    for (int i = itemIds.length; --i != -1; ) {
+                        items[i] = res.getString(itemIds[i]);
+                    }
+
+                    RadioGroup header = (RadioGroup)getLayoutInflater().inflate(R.layout.sort_dialog, null);
+                    header.check(check);
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(LibraryActivity.this);
+                    builder.setTitle(R.string.sort_by);
+                    builder.setSingleChoiceItems(items, mode + 1, LibraryActivity.this); // add 1 for header
+                    builder.setNeutralButton(R.string.done, null);
+
+                    getSlidingMenu().showContent();
+
+                    AlertDialog dialog = builder.create();
+                    dialog.getListView().addHeaderView(header);
+                    dialog.setOnDismissListener(LibraryActivity.this);
+                    dialog.show();
+                }
+            });
+        ((ImageButton) findViewById(R.id.settings)).setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    startActivity(new Intent(LibraryActivity.this, PreferencesActivity.class));
+                }
+            });
 	}
 
 	@Override
@@ -851,65 +904,20 @@ public class LibraryActivity
 	{
 		MenuItem controls = menu.add(null);
 		CompatHoneycomb.setActionView(controls, mActionControls);
-		CompatHoneycomb.setShowAsAction(controls, MenuItem.SHOW_AS_ACTION_ALWAYS);
-		MenuItem search = menu.add(0, MENU_SEARCH, 0, R.string.search).setIcon(R.drawable.ic_menu_search);
-		CompatHoneycomb.setShowAsAction(search, MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		MenuItem playpause = menu.add(0, MENU_SEARCH, 0, R.string.play_pause).setIcon(R.drawable.ic_menu_search);
-		CompatHoneycomb.setShowAsAction(playpause, MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add(0, MENU_SORT, 0, R.string.sort_by).setIcon(R.drawable.ic_menu_sort_alphabetically);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onPrepareOptionsMenu(Menu menu)
-	{
-		LibraryAdapter adapter = mCurrentAdapter;
-		menu.findItem(MENU_SORT).setEnabled(adapter != null && adapter.getMediaType() != MediaUtils.TYPE_FILE);
-		return super.onPrepareOptionsMenu(menu);
+        CompatHoneycomb.setShowAsAction(controls, MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return true;
+        // don't call super to avoid adding settings menu item
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		switch (item.getItemId()) {
-		case MENU_SEARCH:
-			setSearchBoxVisible(!mSearchBoxVisible);
-			return true;
 		case MENU_PLAYBACK:
 			openPlaybackActivity();
 			return true;
-		case MENU_SORT: {
-			MediaAdapter adapter = (MediaAdapter)mCurrentAdapter;
-			int mode = adapter.getSortMode();
-			int check;
-			if (mode < 0) {
-				check = R.id.descending;
-				mode = ~mode;
-			} else {
-				check = R.id.ascending;
-			}
-
-			int[] itemIds = adapter.getSortEntries();
-			String[] items = new String[itemIds.length];
-			Resources res = getResources();
-			for (int i = itemIds.length; --i != -1; ) {
-				items[i] = res.getString(itemIds[i]);
-			}
-
-			RadioGroup header = (RadioGroup)getLayoutInflater().inflate(R.layout.sort_dialog, null);
-			header.check(check);
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle(R.string.sort_by);
-			builder.setSingleChoiceItems(items, mode + 1, this); // add 1 for header
-			builder.setNeutralButton(R.string.done, null);
-
-			AlertDialog dialog = builder.create();
-			dialog.getListView().addHeaderView(header);
-			dialog.setOnDismissListener(this);
-			dialog.show();
-			return true;
-		}
+		case MENU_PREFS:
+            return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}

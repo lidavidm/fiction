@@ -198,6 +198,8 @@ public class FullPlaybackActivity extends PlaybackActivity
 		setControlsVisible(settings.getBoolean(PrefKeys.VISIBLE_CONTROLS, true));
 		setExtraInfoVisible(settings.getBoolean(PrefKeys.VISIBLE_EXTRA_INFO, false));
 		setDuration(0);
+
+        ((LinearLayout) findViewById(R.id.queue_toolbar)).setVisibility(View.GONE);
 	}
 
 	@Override

@@ -69,4 +69,3 @@ THE SOFTWARE.
 			android:contentDescription="@string/clear_search" />
 	</LinearLayout>
 </LinearLayout>
-
