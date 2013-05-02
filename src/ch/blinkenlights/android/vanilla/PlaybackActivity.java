@@ -113,7 +113,7 @@ public abstract class PlaybackActivity extends SlidingActivity
         menu.setFadeDegree(0.35f);
         menu.setFadeEnabled(true);
 
-        setSlidingActionBarEnabled(false);
+        setSlidingActionBarEnabled(true);
         menu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
             @Override
             public void onOpen() {
@@ -151,7 +151,7 @@ public abstract class PlaybackActivity extends SlidingActivity
 		service.jumpToQueuePosition(id);
 	}
 
-	private void refreshSongQueueList() {
+	protected void refreshSongQueueList() {
 		int i, stotal, spos;
 		PlaybackService service = PlaybackService.get(this);
 
@@ -409,13 +409,6 @@ public abstract class PlaybackActivity extends SlidingActivity
 	static final int MENU_CLEAR_QUEUE = 11;
 	static final int MENU_SONG_FAVORITE = 12;
 	static final int MENU_SHOW_QUEUE = 13;
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu)
-	{
-		menu.add(0, MENU_PREFS, 0, R.string.settings).setIcon(R.drawable.ic_menu_preferences);
-		return true;
-	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)

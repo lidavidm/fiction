@@ -15,21 +15,24 @@
             android:layout_weight="1"
             android:layout_height="wrap_content"
 		    android:src="@drawable/ic_menu_search"
-            android:contentDescription="@string/search" />
+            android:contentDescription="@string/search"
+            style="?android:attr/borderlessButtonStyle"/>
         <ImageButton
             android:id="@+id/sort"
             android:layout_width="0px"
             android:layout_weight="1"
             android:layout_height="wrap_content"
 		    android:src="@drawable/ic_menu_sort"
-            android:contentDescription="@string/sort_by" />
+            android:contentDescription="@string/sort_by"
+            style="?android:attr/borderlessButtonStyle" />
         <ImageButton
             android:id="@+id/settings"
             android:layout_width="0px"
             android:layout_weight="1"
             android:layout_height="wrap_content"
 		    android:src="@drawable/ic_menu_settings"
-            android:contentDescription="@string/search" />
+            android:contentDescription="@string/search"
+            style="?android:attr/borderlessButtonStyle"  />
     </LinearLayout>
 	<TextView
 		android:id="@+id/queue_title"

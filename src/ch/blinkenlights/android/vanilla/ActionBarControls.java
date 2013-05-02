@@ -47,7 +47,7 @@ public class ActionBarControls extends LinearLayout {
 		int width = MeasureSpec.getSize(ws);
 		int widthMode = MeasureSpec.getMode(ws);
 		if (widthMode != MeasureSpec.EXACTLY)
-			width = (int)(200 * density);
+			width = (int)(150 * density);
 
 		setMeasuredDimension(width, (int)(40 * density));
 

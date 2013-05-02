@@ -43,6 +43,7 @@ import android.support.v4.view.ViewPager;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -131,6 +132,7 @@ public class LibraryActivity
 	private TextView mArtist;
 	private ImageView mCover;
 	private View mEmptyQueue;
+    private boolean mIsPlaying;
 
 	private HorizontalScrollView mLimiterScroller;
 	private ViewGroup mLimiterViews;
@@ -599,10 +601,15 @@ public class LibraryActivity
 	public void onClick(View view)
 	{
 		if (view == mClearButton) {
-			if (mTextFilter.getText().length() == 0)
+			if (mTextFilter.getText().length() == 0) {
 				setSearchBoxVisible(false);
-			else
+                InputMethodManager imm = (InputMethodManager) getSystemService(
+                    INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(mTextFilter.getWindowToken(), 0);
+            }
+			else {
 				mTextFilter.setText("");
+            }
 		} else if (view == mCover || view == mActionControls) {
 			openPlaybackActivity();
 		} else if (view == mEmptyQueue) {
@@ -713,6 +720,8 @@ public class LibraryActivity
 	private static final int MENU_ENQUEUE_ALL = 10;
 	private static final int MENU_MORE_FROM_ALBUM = 11;
 	private static final int MENU_MORE_FROM_ARTIST = 12;
+    private static final int MENU_PREV = 13;
+    private static final int MENU_NEXT = 14;
 
 	/**
 	 * Creates a context menu for an adapter row.
@@ -905,9 +914,21 @@ public class LibraryActivity
 		MenuItem controls = menu.add(null);
 		CompatHoneycomb.setActionView(controls, mActionControls);
         CompatHoneycomb.setShowAsAction(controls, MenuItem.SHOW_AS_ACTION_ALWAYS);
-        return true;
-        // don't call super to avoid adding settings menu item
+        controls = menu.add(0, MENU_PREV, 0, R.string.previous_song).setIcon(R.drawable.ic_menu_previous);
+        CompatHoneycomb.setShowAsAction(controls, MenuItem.SHOW_AS_ACTION_ALWAYS);
+        controls = menu.add(0, MENU_PLAY, 0, R.string.play_pause);
+        controls.setIcon(R.drawable.ic_menu_play);
+        CompatHoneycomb.setShowAsAction(controls, MenuItem.SHOW_AS_ACTION_ALWAYS);
+        controls = menu.add(0, MENU_NEXT, 0, R.string.next_song).setIcon(R.drawable.ic_menu_next);
+        CompatHoneycomb.setShowAsAction(controls, MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
 	}
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(MENU_PLAY).setIcon(!mIsPlaying ? R.drawable.ic_menu_play : R.drawable.ic_menu_pause);
+        return super.onPrepareOptionsMenu(menu);
+    }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -916,7 +937,14 @@ public class LibraryActivity
 		case MENU_PLAYBACK:
 			openPlaybackActivity();
 			return true;
-		case MENU_PREFS:
+        case MENU_PREV:
+			shiftCurrentSong(SongTimeline.SHIFT_PREVIOUS_SONG);
+            return true;
+        case MENU_PLAY:
+			playPause();
+            return true;
+        case MENU_NEXT:
+			shiftCurrentSong(SongTimeline.SHIFT_NEXT_SONG);
             return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -1026,6 +1054,11 @@ public class LibraryActivity
 	{
 		super.onStateChange(state, toggled);
 
+		if ((toggled & PlaybackService.FLAG_PLAYING) != 0) {
+            mIsPlaying = ((state & PlaybackService.FLAG_PLAYING) == 0) ?
+                false : true;
+            invalidateOptionsMenu();
+		}
 		if ((toggled & PlaybackService.FLAG_NO_MEDIA) != 0) {
 			// update visibility of controls
 			setSearchBoxVisible(mSearchBoxVisible);
