@@ -61,11 +61,6 @@ public final class CoverView extends View implements Handler.Callback {
 	 */
 	private final Handler mUiHandler = new Handler(this);
 	/**
-	 * How to render cover art and metadata. One of
-	 * CoverBitmap.STYLE_*
-	 */
-	private int mCoverStyle;
-	/**
 	 * Interface to respond to CoverView motion actions.
 	 */
 	public interface Callback {
@@ -173,17 +168,16 @@ public final class CoverView extends View implements Handler.Callback {
 	 * @param callback The callback for nextSong/previousSong
 	 * @param style One of CoverBitmap.STYLE_*
 	 */
-	public void setup(Looper looper, Callback callback, int style)
+	public void setup(Looper looper, Callback callback)
 	{
 		mHandler = new Handler(looper, this);
 		mCallback = callback;
-		mCoverStyle = style;
 	}
 
 	/**
 	 * Reset the scroll position to its default state.
 	 */
-	private void resetScroll()
+	public void resetScroll()
 	{
 		if (!mScroller.isFinished())
 			mScroller.abortAnimation();
@@ -361,18 +355,17 @@ public final class CoverView extends View implements Handler.Callback {
 	{
 		Song song = mSongs[i];
 
-		int style = mCoverStyle;
 		Context context = getContext();
 		Bitmap cover = song == null ? null : song.getCover(context);
 
-		if (cover == null && style == CoverBitmap.STYLE_NO_INFO) {
+		if (cover == null) {
 			Bitmap def = mDefaultCover;
 			if (def == null) {
 				mDefaultCover = def = CoverBitmap.generateDefaultCover(getWidth(), getHeight());
 			}
 			mBitmaps[i] = def;
 		} else {
-			mBitmaps[i] = CoverBitmap.createBitmap(context, style, cover, song, getWidth(), getHeight());
+			mBitmaps[i] = CoverBitmap.createBitmap(context, cover, getWidth(), getHeight());
 		}
 
 		postInvalidate();

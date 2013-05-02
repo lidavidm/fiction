@@ -46,6 +46,8 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.slidingmenu.lib.SlidingMenu;
+
 /**
  * The primary playback screen with playback controls and large cover display.
  */
@@ -86,11 +88,6 @@ public class FullPlaybackActivity extends PlaybackActivity
 	private boolean mSeekBarTracking;
 	private boolean mPaused;
 
-	/**
-	 * The current display mode, which determines layout and cover render style.
-	 */
-	private int mDisplayMode;
-
 	private Action mCoverPressAction;
 	private Action mCoverLongPressAction;
 
@@ -124,32 +121,13 @@ public class FullPlaybackActivity extends PlaybackActivity
 		setTitle(R.string.playback_view);
 
 		SharedPreferences settings = PlaybackService.getSettings(this);
-		int displayMode = Integer.parseInt(settings.getString(PrefKeys.DISPLAY_MODE, "2"));
-		mDisplayMode = displayMode;
 
 		int layout = R.layout.full_playback;
-		int coverStyle;
-
-		switch (displayMode) {
-		default:
-			Log.w("VanillaMusic", "Invalid display mode given. Defaulting to widget mode.");
-			// fall through
-		case DISPLAY_INFO_WIDGETS:
-			coverStyle = CoverBitmap.STYLE_NO_INFO;
-			layout = R.layout.full_playback_alt;
-			break;
-		case DISPLAY_INFO_OVERLAP:
-			coverStyle = CoverBitmap.STYLE_OVERLAPPING_BOX;
-			break;
-		case DISPLAY_INFO_BELOW:
-			coverStyle = CoverBitmap.STYLE_INFO_BELOW;
-			break;
-		}
 
 		setContentView(layout);
 
 		CoverView coverView = (CoverView)findViewById(R.id.cover_view);
-		coverView.setup(mLooper, this, coverStyle);
+		coverView.setup(mLooper, this);
 		coverView.setOnClickListener(this);
 		coverView.setOnLongClickListener(this);
 		mCoverView = coverView;
@@ -200,6 +178,14 @@ public class FullPlaybackActivity extends PlaybackActivity
 		setDuration(0);
 
         ((LinearLayout) findViewById(R.id.queue_toolbar)).setVisibility(View.GONE);
+
+        getSlidingMenu().setOnOpenListener(new SlidingMenu.OnOpenListener() {
+                @Override
+                public void onOpen() {
+                    mCoverView.resetScroll();
+                    refreshSongQueueList();
+                }
+            });
 	}
 
 	@Override
@@ -208,10 +194,6 @@ public class FullPlaybackActivity extends PlaybackActivity
 		super.onStart();
 
 		SharedPreferences settings = PlaybackService.getSettings(this);
-		if (mDisplayMode != Integer.parseInt(settings.getString(PrefKeys.DISPLAY_MODE, "2"))) {
-			finish();
-			startActivity(new Intent(this, FullPlaybackActivity.class));
-		}
 
 		mCoverPressAction = Action.getAction(settings, PrefKeys.COVER_PRESS_ACTION, Action.ToggleControls);
 		mCoverLongPressAction = Action.getAction(settings, PrefKeys.COVER_LONGPRESS_ACTION, Action.PlayPause);

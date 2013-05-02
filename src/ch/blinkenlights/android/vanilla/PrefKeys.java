@@ -33,6 +33,7 @@ public class PrefKeys {
 	public static final String DEFAULT_PLAYLIST_ACTION = "default_playlist_action";
 	public static final String DISABLE_COVER_ART = "disable_cover_art";
 	public static final String DISABLE_LOCKSCREEN = "disable_lockscreen";
+    // Deprecated - do not use
 	public static final String DISPLAY_MODE = "display_mode";
 	public static final String DOUBLE_TAP = "double_tap";
 	public static final String ENABLE_SHAKE = "enable_shake";
