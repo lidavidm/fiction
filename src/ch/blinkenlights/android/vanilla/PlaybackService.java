@@ -66,9 +66,6 @@ import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Vector;
-import ch.blinkenlights.bastp.Bastp;
 
 
 /**
@@ -372,7 +369,10 @@ public final class PlaybackService extends Service
 	 */
 	private boolean mReplayGainTrackEnabled;
 	private boolean mReplayGainAlbumEnabled;
-	private boolean mReplayGainSilenceEnabled;
+	private int mReplayGainBump;
+	private int mReplayGainUntaggedDeBump;
+	
+	private BastpUtil mBastpUtil;
 	
 	@Override
 	public void onCreate()
@@ -385,6 +385,7 @@ public final class PlaybackService extends Service
 		int state = loadState();
 
 		mMediaPlayer = getNewMediaPlayer();
+		mBastpUtil = new BastpUtil();
 		
 		mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 		mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE);
@@ -408,8 +409,9 @@ public final class PlaybackService extends Service
 
 		mReplayGainTrackEnabled = settings.getBoolean(PrefKeys.ENABLE_TRACK_REPLAYGAIN, false);
 		mReplayGainAlbumEnabled = settings.getBoolean(PrefKeys.ENABLE_ALBUM_REPLAYGAIN, false);
-		mReplayGainSilenceEnabled = settings.getBoolean(PrefKeys.SILENCE_NONRG_TRACKS, false);
-
+		mReplayGainBump = settings.getInt(PrefKeys.REPLAYGAIN_BUMP, 75);  /* seek bar is 150 -> 75 == middle == 0 */
+		mReplayGainUntaggedDeBump = settings.getInt(PrefKeys.REPLAYGAIN_UNTAGGED_DEBUMP, 150); /* seek bar is 150 -> == 0 */
+		
 		PowerManager powerManager = (PowerManager)getSystemService(POWER_SERVICE);
 		mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "VanillaMusicLock");
 
@@ -570,62 +572,68 @@ public final class PlaybackService extends Service
 	}
 	
 	public void prepareMediaPlayer(MediaPlayer mp, String path) throws IOException{
+		mp.setDataSource(path);
+		mp.prepare();
+		applyReplayGain(mp, path);
+	}
+	
+	
+	/**
+	 * Make sure that the current ReplayGain volume matches
+	 * the (maybe just changed) user settings
+	*/
+	private void refreshReplayGainValues() {
+		Song curSong = getSong(0);
+		
+		if(mMediaPlayer == null)
+			return;
+		if(curSong == null)
+			return;
+
+		applyReplayGain(mMediaPlayer, curSong.path);
+		if(mPreparedMediaPlayer != null) {
+			applyReplayGain(mPreparedMediaPlayer, getSong(1).path);
+		}
+	}
+
+	
+	private void applyReplayGain(MediaPlayer mp, String path) {
+		
+		float[] rg = getReplayGainValues(path); /* track, album */
 		float adjust = 0f;
 		
-		mp.setDataSource(path);
-		
-		float[] rg = calculateReplayGainAdjustment(path); /* track, album */
-		
 		if(mReplayGainAlbumEnabled) {
-			adjust = (rg[0] > 0 ? rg[0] : adjust); /* do we have track adjustment ? */
-			adjust = (rg[1] > 0 ? rg[1] : adjust); /* ..or, even better, album adj? */
+			adjust = (rg[0] != 0 ? rg[0] : adjust); /* do we have track adjustment ? */
+			adjust = (rg[1] != 0 ? rg[1] : adjust); /* ..or, even better, album adj? */
 		}
 		
 		if(mReplayGainTrackEnabled || (mReplayGainAlbumEnabled && adjust == 0)) {
-			adjust = (rg[1] > 0 ? rg[1] : adjust); /* do we have album adjustment ? */
-			adjust = (rg[0] > 0 ? rg[0] : adjust); /* ..or, even better, track adj? */
+			adjust = (rg[1] != 0 ? rg[1] : adjust); /* do we have album adjustment ? */
+			adjust = (rg[0] != 0 ? rg[0] : adjust); /* ..or, even better, track adj? */
 		}
 		
-		if(adjust == 0 && mReplayGainSilenceEnabled) {
-			adjust = 0.25f;
-		}
-		
-		if(adjust > 0) {
-			adjust = adjust * 1.5f; /* add some slack */
-			Log.d("VanillaMusic", "adjusting replaygain of "+path+" to "+adjust);
+		if(adjust == 0) {
+			/* No RG value found: decrease volume for untagged song if requested by user */
+			adjust = (mReplayGainUntaggedDeBump-150)/10f;
 		} else {
-			adjust = 1.0f; /* no RG found -> (re-)set mediaplayer to default volume */
+			/* This song has some replay gain info, we are now going to apply the 'bump' value
+			** The preferences stores the raw value of the seekbar, that's 0-150
+			** But we want -15 <-> +15, so 75 shall be zero */
+			adjust += 2*(mReplayGainBump-75)/10f; /* 2* -> we want +-15, not +-7.5 */
 		}
 		
-		mp.setVolume(adjust, adjust);
-		mp.prepare();
+		if(mReplayGainAlbumEnabled == false && mReplayGainTrackEnabled == false) {
+			/* Feature is disabled: Make sure that we are going to 100% volume */
+			adjust = 0f;
+		}
+		
+		float rg_result = (float)Math.pow(10, (adjust/20) );
+		mp.setVolume(rg_result, rg_result);
+		Log.d("VanillaMusic", "rg="+rg_result+", adj="+adjust+", pth="+path);
 	}
 	
-	/**
-	 * Returns TRACK, ALBUM gain values for given path
-	 * A value of 0 means that the tag was not found in given file
-	*/
-	private float[] calculateReplayGainAdjustment(String path) {
-		String[] keys = { "REPLAYGAIN_TRACK_GAIN", "REPLAYGAIN_ALBUM_GAIN" };
-		float[] adjust= { 0f                     , 0f                      };
-		HashMap tags  = (new Bastp()).getTags(path);
-		
-		for (int i=0; i<keys.length; i++) {
-			String curKey = keys[i];
-			if(tags.containsKey(curKey)) {
-				String rg_raw = (String)((Vector)tags.get(curKey)).get(0);
-				String rg_numonly = "";
-				float rg_float = 0f;
-				try {
-					String nums = rg_raw.replaceAll("[^0-9.-]","");
-					rg_float = Float.parseFloat(nums);
-				} catch(Exception e) {}
-				
-				float rg_result = (float)Math.pow(10, (rg_float/20) );
-				adjust[i] = rg_result;
-			}
-		}
-		return adjust;
+	public float[] getReplayGainValues(String path) {
+		return mBastpUtil.getReplayGainValues(path);
 	}
 	
 	/**
@@ -743,10 +751,16 @@ public final class PlaybackService extends Service
 			mShakeThreshold = settings.getInt(PrefKeys.SHAKE_THRESHOLD, 80) / 10.0f;
 		} else if (PrefKeys.ENABLE_TRACK_REPLAYGAIN.equals(key)) {
 			mReplayGainTrackEnabled = settings.getBoolean(PrefKeys.ENABLE_TRACK_REPLAYGAIN, false);
+			refreshReplayGainValues();
 		} else if (PrefKeys.ENABLE_ALBUM_REPLAYGAIN.equals(key)) {
 			mReplayGainAlbumEnabled = settings.getBoolean(PrefKeys.ENABLE_ALBUM_REPLAYGAIN, false);
-		} else if (PrefKeys.SILENCE_NONRG_TRACKS.equals(key)) {
-			mReplayGainSilenceEnabled = settings.getBoolean(PrefKeys.SILENCE_NONRG_TRACKS, false);
+			refreshReplayGainValues();
+		} else if (PrefKeys.REPLAYGAIN_BUMP.equals(key)) {
+			mReplayGainBump = settings.getInt(PrefKeys.REPLAYGAIN_BUMP, 75);
+			refreshReplayGainValues();
+		} else if (PrefKeys.REPLAYGAIN_UNTAGGED_DEBUMP.equals(key)) {
+			mReplayGainUntaggedDeBump = settings.getInt(PrefKeys.REPLAYGAIN_UNTAGGED_DEBUMP, 150);
+			refreshReplayGainValues();
 		}
 
 		CompatFroyo.dataChanged(this);
@@ -1129,6 +1143,7 @@ public final class PlaybackService extends Service
 			
 			if(mPreparedMediaPlayer != null &&
 			   mPreparedMediaPlayer.isPlaying()) {
+				
 				mMediaPlayer.release();
 				mMediaPlayer = mPreparedMediaPlayer;
 				mPreparedMediaPlayer = null;
