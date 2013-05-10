@@ -1,0 +1,146 @@
+package com.lithiumli.fiction.fragments;
+
+import android.app.ListFragment;
+import android.app.LoaderManager;
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.CursorLoader;
+import android.content.Loader;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.MediaStore;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AlphabetIndexer;
+import android.widget.ListView;
+import android.widget.CursorAdapter;
+import android.widget.SectionIndexer;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+
+import com.lithiumli.fiction.FictionActivity;
+import com.lithiumli.fiction.R;
+import com.lithiumli.fiction.PlaybackQueue;
+import com.lithiumli.fiction.PlaybackService;
+
+public class SongsListFragment
+    extends ListFragment
+    implements LoaderManager.LoaderCallbacks<Cursor>,
+               AdapterView.OnItemClickListener {
+    SongsCursorAdapter mAdapter;
+    static final String[] PROJECTION = {
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.ALBUM,
+        MediaStore.Audio.Media.ALBUM_ID,
+        MediaStore.Audio.Media.DURATION
+    };
+
+    @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        setEmptyText("No songs");
+        mAdapter = new SongsCursorAdapter(getActivity(), null, 0);
+        setListAdapter(mAdapter);
+
+        getListView().setOnItemClickListener(this);
+
+        getLoaderManager().initLoader(0, null, this);
+    }
+
+    public void onItemClick(AdapterView<?> parent, View view, int position, long
+                            id) {
+        Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                                                    id);
+        PlaybackService service = ((FictionActivity) getActivity())
+            .getService();
+        PlaybackQueue queue = service.getQueue();
+        if (queue.getContext() != PlaybackQueue.QueueContext.SONG) {
+            queue.setContext(PlaybackQueue.QueueContext.SONG,
+                             mAdapter.getCursor());
+        }
+        service.play(position);
+    }
+
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String select = "(" + MediaStore.Audio.Media.IS_MUSIC + "=1)";
+        return new CursorLoader(getActivity(), uri,
+                                PROJECTION,
+                                select, null,
+                                MediaStore.Audio.Media.TITLE_KEY + " COLLATE UNICODE ASC");
+    }
+
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+
+        getListView().setFastScrollEnabled(true);
+        getListView().setFastScrollAlwaysVisible(true);
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
+    }
+
+    public class SongsCursorAdapter extends CursorAdapter implements SectionIndexer {
+        private Cursor mCursor;
+        private Context mContext;
+        private final LayoutInflater mInflater;
+        private AlphabetIndexer mIndexer;
+
+        public SongsCursorAdapter(Context context, Cursor c, int flags) {
+            super(context, c, flags);
+            mInflater = LayoutInflater.from(context);
+            mContext = context;
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup
+                            parent) {
+            final View view = mInflater.inflate(R.layout.list_item,
+                                                parent, false);
+            return view;
+        }
+
+        public void bindView(View view, Context context, Cursor cursor) {
+            TextView title = (TextView) view.findViewById(R.id.title_text);
+            TextView sub = (TextView) view.findViewById(R.id.sub_text);
+
+            String songTitle =
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+            String songArtist =
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
+            String songAlbum =
+                cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM));
+
+            title.setText(songTitle);
+
+            sub.setText(songArtist + " — " + songAlbum);
+        }
+
+        public Cursor swapCursor(Cursor c) {
+            if (c != null) {
+                mIndexer = new AlphabetIndexer(c,
+                                               c.getColumnIndex(MediaStore.Audio.Media.TITLE),
+                                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            }
+            return super.swapCursor(c);
+        }
+
+        public int getPositionForSection(int section) {
+            return mIndexer.getPositionForSection(section);
+        }
+
+        public int getSectionForPosition(int position) {
+            return mIndexer.getSectionForPosition(position);
+        }
+
+        public Object[] getSections() {
+            return mIndexer.getSections();
+        }
+    }
+}

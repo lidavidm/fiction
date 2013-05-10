@@ -1,13 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
-<TextView
-    android:layout_width="fill_parent"
-    android:layout_height="wrap_content"
-    android:text="Hello World, FictionActivity"
-    />
-</LinearLayout>
+              android:orientation="vertical"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              >
+    <android.support.v4.view.ViewPager
+        android:id="@+id/view_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        />
 
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/bab">
+        <View android:id="@+id/bab_hr"
+              android:layout_width="fill_parent"
+              android:layout_height="2dp"
+              android:background="#33B5E5" />
+
+        <TextView android:id="@+id/bab_song_name"
+                  android:text="Song Name"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@id/bab_hr"
+                  />
+        <TextView android:id="@+id/bab_song_subtitle"
+                  android:text="Artist — Album"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@id/bab_song_name"
+                  android:layout_alignParentLeft="true"
+                  />
+
+        <!-- <ImageButton android:id="@+id/bab_next" -->
+        <!--              android:layout_width="wrap_content" -->
+        <!--              android:layout_height="wrap_content" -->
+        <!--              android:layout_alignParentRight="true" -->
+        <!--              style="?android:attr/borderlessButtonStyle" -->
+        <!--              android:src="@drawable/forward_button" -->
+        <!--              /> -->
+
+        <!-- <ImageButton android:id="@+id/bab_play_pause" -->
+        <!--              android:layout_width="wrap_content" -->
+        <!--              android:layout_height="wrap_content" -->
+        <!--              android:layout_toLeftOf="@id/bab_next" -->
+        <!--              style="?android:attr/borderlessButtonStyle" -->
+        <!--              android:src="@drawable/play_button" -->
+        <!--              android:onClick="playPauseButton" -->
+        <!--              /> -->
+    </RelativeLayout>
+</LinearLayout>

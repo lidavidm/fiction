@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TwoLineListItem xmlns:android="http://schemas.android.com/apk/res/android"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:mode="twoLine"
+                 >
+
+	<TextView android:id="@+id/title_text"
+		      android:layout_width="match_parent"
+		      android:layout_height="wrap_content"
+              android:layout_marginTop="8dip"
+              android:lines="1"
+              android:scrollHorizontally="true"
+              android:ellipsize="end"
+              android:singleLine="true"
+              android:textStyle="bold"
+              android:textColor="#FFF" />
+
+	<TextView android:id="@+id/sub_text"
+		      android:layout_width="match_parent"
+		      android:layout_height="wrap_content"
+		      android:layout_below="@id/title_text"
+              android:lines="1"
+              android:scrollHorizontally="true"
+              android:ellipsize="end"
+              android:singleLine="true" />
+</TwoLineListItem>
