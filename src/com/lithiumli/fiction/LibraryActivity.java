@@ -16,8 +16,6 @@ import android.util.Log;
 import android.support.v4.view.ViewPager;
 import android.support.v13.app.FragmentPagerAdapter;
 
-import com.viewpagerindicator.TitlePageIndicator;
-
 import java.util.ArrayList;
 
 import com.lithiumli.fiction.fragments.*;

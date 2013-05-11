@@ -41,7 +41,7 @@ public class SongsListFragment
     };
 
     @Override
-        public void onActivityCreated(Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setEmptyText("No songs");
         mAdapter = new SongsCursorAdapter(getActivity(), null, 0);

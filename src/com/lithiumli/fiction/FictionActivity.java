@@ -10,11 +10,18 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.widget.ListView;
 
 import android.support.v4.content.LocalBroadcastManager;
 
-abstract public class FictionActivity extends Activity
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
+import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
+
+abstract public class FictionActivity extends SlidingActivity
 {
+    ListView mQueueListView;
+    PlaybackQueue.QueueAdapter mAdapter;
+
     protected PlaybackService mService;
     protected boolean mBound;
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -23,6 +30,9 @@ abstract public class FictionActivity extends Activity
                 mService = binder.getService();
                 mBound = true;
                 Log.d("fiction", "finished binding");
+
+                mAdapter = mService.getQueue().getAdapter(getApplicationContext());
+                mQueueListView.setAdapter(mAdapter);
             }
 
             public void onServiceDisconnected(ComponentName className) {
@@ -44,6 +54,35 @@ abstract public class FictionActivity extends Activity
     {
         super.onCreate(savedInstanceState);
 
+        setContentView(R.layout.main);
+
+        // Queue menu
+        SlidingMenu menu = getSlidingMenu();
+        menu.setMode(SlidingMenu.LEFT);
+        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
+        menu.setShadowWidthRes(R.dimen.slidingmenu_shadow_width);
+        menu.setShadowDrawable(R.drawable.shadow);
+        menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
+        menu.setFadeDegree(0.35f);
+
+        setSlidingActionBarEnabled(false);
+        setBehindContentView(R.layout.queue);
+
+        mQueueListView = (ListView) findViewById(R.id.queue);
+        mQueueListView.setFastScrollEnabled(true);
+        mQueueListView.setFastScrollAlwaysVisible(true);
+
+        menu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+                @Override
+                public void onOpen() {
+                    if (mAdapter != null) {
+                        Log.d("fiction", "updating queue");
+                        mAdapter.notifyDataSetChanged();
+                    }
+                }
+            });
+
+        // Playback stuff
         Intent intent = new Intent(this, PlaybackService.class);
         startService(intent);
         Log.d("fiction", "binding");
