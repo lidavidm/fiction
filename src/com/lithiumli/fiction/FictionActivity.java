@@ -72,15 +72,15 @@ abstract public class FictionActivity extends SlidingActivity
         mQueueListView.setFastScrollEnabled(true);
         mQueueListView.setFastScrollAlwaysVisible(true);
 
-        menu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
-                @Override
-                public void onOpen() {
-                    if (mAdapter != null) {
-                        Log.d("fiction", "updating queue");
-                        mAdapter.notifyDataSetChanged();
-                    }
-                }
-            });
+        // menu.setOnOpenListener(new SlidingMenu.OnOpenListener() {
+        //         @Override
+        //         public void onOpen() {
+        //             if (mAdapter != null) {
+        //                 Log.d("fiction", "updating queue");
+        //                 mAdapter.notifyDataSetChanged();
+        //             }
+        //         }
+        //     });
 
         // Playback stuff
         Intent intent = new Intent(this, PlaybackService.class);

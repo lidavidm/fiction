@@ -10,7 +10,7 @@ import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListAdapter;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -30,6 +30,8 @@ public class PlaybackQueue {
     ArrayList<Song> mSongs = new ArrayList<Song>(10);
     Cursor mCursor;
     int mCurrent;
+
+    QueueAdapter mAdapter;
 
     public PlaybackQueue(// Context context
                          ) {
@@ -66,6 +68,10 @@ public class PlaybackQueue {
         default:
             break;
         }
+
+        if (mAdapter != null) {
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     public int getCount() {
@@ -87,33 +93,19 @@ public class PlaybackQueue {
     }
 
     public QueueAdapter getAdapter(Context context) {
-        // TODO some way to update song list
-        return new QueueAdapter(context, this);
+        if (mAdapter == null) {
+            mAdapter = new QueueAdapter(context, this);
+        }
+        return mAdapter;
     }
 
-    public class QueueAdapter implements ListAdapter {
+    public class QueueAdapter extends BaseAdapter {
         Context mContext;
         PlaybackQueue mQueue;
-        final DataSetObservable mDataSetObservable = new DataSetObservable();
 
         public QueueAdapter(Context context, PlaybackQueue queue) {
             mContext = context;
             mQueue = queue;
-        }
-
-        @Override
-        public boolean areAllItemsEnabled() {
-            return true;
-        }
-
-        @Override
-        public boolean isEnabled(int position) {
-            return true;
-        }
-
-        @Override
-        public boolean isEmpty() {
-            return getCount() == 0;
         }
 
         @Override
@@ -152,30 +144,6 @@ public class PlaybackQueue {
             sub.setText(song.getArtist() + " — " + song.getAlbum());
 
             return view;
-        }
-
-        @Override
-        public int getViewTypeCount() {
-            return 1;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public void registerDataSetObserver(DataSetObserver observer) {
-            mDataSetObservable.registerObserver(observer);
-        }
-
-        @Override
-        public void unregisterDataSetObserver(DataSetObserver observer) {
-            mDataSetObservable.unregisterObserver(observer);
-        }
-
-        public void notifyDataSetChanged() {
-            mDataSetObservable.notifyChanged();
         }
     }
 }
