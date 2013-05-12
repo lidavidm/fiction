@@ -83,6 +83,14 @@ public class LibraryActivity
         button.invalidate();
     }
 
+    public void prevButton(View view) {
+        getService().prev();
+    }
+
+    public void nextButton(View view) {
+        getService().next();
+    }
+
     @Override
     public void onSongChange(Song song) {
         babSongTitle.setText(song.getTitle());

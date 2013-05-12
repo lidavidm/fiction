@@ -25,6 +25,7 @@ public class PlaybackQueue {
     }
 
     Context mContext;
+    PlaybackService mService;
 
     QueueContext mQueueContext;
     ArrayList<Song> mSongs = new ArrayList<Song>(10);
@@ -33,9 +34,7 @@ public class PlaybackQueue {
 
     QueueAdapter mAdapter;
 
-    public PlaybackQueue(// Context context
-                         ) {
-        // mContext = context;
+    public PlaybackQueue() {
     }
 
     public QueueContext getContext() {
@@ -80,6 +79,10 @@ public class PlaybackQueue {
 
     public Song getCurrent() {
         return mSongs.get(mCurrent);
+    }
+
+    public int getCurrentPosition() {
+        return mCurrent;
     }
 
     public Song getItem(int position) {

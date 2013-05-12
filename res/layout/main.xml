@@ -50,6 +50,7 @@
                      android:layout_height="wrap_content"
                      style="?android:attr/borderlessButtonStyle"
                      android:src="@drawable/ic_menu_previous"
+                     android:onClick="prevButton"
                      />
 
         <ImageButton android:id="@+id/bab_play_pause"
@@ -65,6 +66,7 @@
                      android:layout_height="wrap_content"
                      style="?android:attr/borderlessButtonStyle"
                      android:src="@drawable/ic_menu_next"
+                     android:onClick="nextButton"
                      />
     </LinearLayout>
 </LinearLayout>

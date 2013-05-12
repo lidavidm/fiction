@@ -5,7 +5,7 @@
         <item name="android:actionBarStyle">@style/FictionActionBar</item>
     </style>
     <style name="FictionActionBar" parent="@android:style/Widget.Holo.ActionBar">
-        <item name="android:background">@color/songs_header</item>
+        <item name="android:background">@drawable/ab_background_textured_fiction</item>
         <item name="android:titleTextStyle">@style/FictionActionBar.Title</item>
         <item name="android:subtitleTextStyle">@style/FictionActionBar.Subtitle</item>
     </style>

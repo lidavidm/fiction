@@ -27,17 +27,17 @@ import java.util.ArrayList;
 import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.Song;
 
-// ~/android/samples/android-16/ApiDemos/src/com/example/android/apis/app/MessengerService.java
-
 public class PlaybackService
     extends Service
-    implements MediaPlayer.OnPreparedListener {
+    implements MediaPlayer.OnPreparedListener,
+               MediaPlayer.OnCompletionListener {
     public static final String EVENT_PLAYING = "com.lithiumli.fiction.PLAYING";
     public static final String DATA_SONG = "com.lithiumli.fiction.SONG";
 
     private static final int NOTIFICATION_PLAYING = 0;
 
     MediaPlayer mMediaPlayer;
+    MediaPlayer mNextPlayer;
     boolean mPaused = false;
     Song mCurrentSong;
     PlaybackQueue mQueue;
@@ -77,10 +77,27 @@ public class PlaybackService
         }
         player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
         player.start();
+        prepareNext();
 
         mPaused = false;
 
         showNotification();
+    }
+
+    public void onCompletion(MediaPlayer player) {
+        int position = mQueue.getCurrentPosition();
+
+        if (position >= mQueue.getCount() - 1) {
+            return;
+        }
+
+        mQueue.setCurrent(position + 1);
+        mMediaPlayer = mNextPlayer;
+        prepareNext();
+
+        Intent intent = new Intent(EVENT_PLAYING);
+        intent.putExtra(DATA_SONG, mQueue.getCurrent());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     @Override
@@ -117,6 +134,22 @@ public class PlaybackService
         }
     }
 
+    public void next() {
+        int position = mQueue.getCurrentPosition();
+
+        if (position <= mQueue.getCount()) {
+            play(position + 1);
+        }
+    }
+
+    public void prev() {
+        int position = mQueue.getCurrentPosition();
+
+        if (position > 0) {
+            play(position - 1);
+        }
+    }
+
     public void pause() {
         Log.d("fiction", "pausing");
         if (mMediaPlayer != null) {
@@ -138,6 +171,39 @@ public class PlaybackService
     }
 
     // PRIVATE INTERFACE
+
+    private void prepareNext() {
+        int position = mQueue.getCurrentPosition();
+
+        if (position >= mQueue.getCount() - 1) {
+            // TODO: repeat modes
+            return;
+        }
+
+        Song song = mQueue.getItem(position + 1);
+        try {
+            mNextPlayer = new MediaPlayer();
+            mNextPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mNextPlayer.setDataSource(getApplicationContext(),
+                                          song.getUri());
+            mNextPlayer.
+                setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                        @Override
+                        public void onPrepared(MediaPlayer player) {
+                            if (mMediaPlayer == null) {
+                            }
+                            else {
+                                mMediaPlayer.setNextMediaPlayer(player);
+                                mMediaPlayer.setOnCompletionListener(PlaybackService.this);
+                                player.setOnCompletionListener(PlaybackService.this);
+                            }
+                        }
+                });
+            mNextPlayer.prepareAsync();
+        }
+        catch (IOException e) {
+        }
+    }
 
     private void showNotification() {
         // Intent launchPlaybackIntent = new Intent(getApplicationContext(),
