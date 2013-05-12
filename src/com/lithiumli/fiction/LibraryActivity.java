@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.util.Log;
 
@@ -48,7 +48,7 @@ public class LibraryActivity
         getActionBar().setSubtitle("Fiction Music");
         getActionBar().setTitle("Songs");
 
-        RelativeLayout layout = (RelativeLayout) findViewById(R.id.bab);
+        View layout = findViewById(R.id.bab_info);
         layout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -57,6 +57,30 @@ public class LibraryActivity
                     // FictionActivity.this.startActivity(intent);
                 }
             });
+    }
+
+    public void playPauseButton(View view) {
+        PlaybackService service = getService();
+        ImageButton button = (ImageButton) view;
+        if (service.isPlaying()) {
+            service.pause();
+            button.setImageResource(R.drawable.ic_menu_play);
+        }
+        else {
+            service.unpause();
+
+            if (!service.isPlaying() && service.getQueue().getCount() > 0) {
+                service.play(0);
+            }
+            else {
+                // TODO: restore queue/queue everything and play
+                return;
+            }
+
+            button.setImageResource(R.drawable.ic_menu_pause);
+        }
+
+        button.invalidate();
     }
 
     @Override
