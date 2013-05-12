@@ -13,44 +13,58 @@
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:id="@+id/bab">
         <View android:id="@+id/bab_hr"
               android:layout_width="fill_parent"
               android:layout_height="2dp"
               android:background="#33B5E5" />
 
-        <TextView android:id="@+id/bab_song_name"
-                  android:text="Song Name"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_below="@id/bab_hr"
-                  style="@style/Minititle"
-                  />
-        <TextView android:id="@+id/bab_song_subtitle"
-                  android:text="Artist — Album"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_below="@id/bab_song_name"
-                  android:layout_alignParentLeft="true"
-                  style="@style/Minisubtitle"
-                  />
+        <LinearLayout android:id="@+id/bab_info"
+                      android:layout_width="wrap_content"
+                      android:layout_height="fill_parent"
+                      android:orientation="vertical"
+                      android:layout_alignParentLeft="true"
+                      android:layout_below="@id/bab_hr"
+                      >
+            <TextView android:id="@+id/bab_song_name"
+                      android:text="Song Name"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      style="@style/Minititle"
+                      />
+            <TextView android:id="@+id/bab_song_subtitle"
+                      android:text="Artist — Album"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      style="@style/Minisubtitle"
+                      />
+        </LinearLayout>
 
-        <!-- <ImageButton android:id="@+id/bab_next" -->
-        <!--              android:layout_width="wrap_content" -->
-        <!--              android:layout_height="wrap_content" -->
-        <!--              android:layout_alignParentRight="true" -->
-        <!--              style="?android:attr/borderlessButtonStyle" -->
-        <!--              android:src="@drawable/forward_button" -->
-        <!--              /> -->
+        <!-- Yes, it's backwards. Behold the RelativeLayout. -->
+        <ImageButton android:id="@+id/bab_next"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_alignParentRight="true"
+                     style="?android:attr/borderlessButtonStyle"
+                     android:src="@drawable/ic_menu_next"
+                     />
 
-        <!-- <ImageButton android:id="@+id/bab_play_pause" -->
-        <!--              android:layout_width="wrap_content" -->
-        <!--              android:layout_height="wrap_content" -->
-        <!--              android:layout_toLeftOf="@id/bab_next" -->
-        <!--              style="?android:attr/borderlessButtonStyle" -->
-        <!--              android:src="@drawable/play_button" -->
-        <!--              android:onClick="playPauseButton" -->
-        <!--              /> -->
+        <ImageButton android:id="@+id/bab_play_pause"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_toLeftOf="@id/bab_next"
+                     style="?android:attr/borderlessButtonStyle"
+                     android:src="@drawable/ic_menu_play"
+                     android:onClick="playPauseButton"
+                     />
+
+        <ImageButton android:id="@+id/bab_previous"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:layout_toLeftOf="@id/bab_play_pause"
+                     style="?android:attr/borderlessButtonStyle"
+                     android:src="@drawable/ic_menu_previous"
+                     />
     </RelativeLayout>
 </LinearLayout>

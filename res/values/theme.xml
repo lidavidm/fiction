@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="Theme.Fiction" parent="@android:style/Theme.Holo">
+        <item name="android:windowBackground">@android:color/black</item>
     </style>
     <style name="Minititle">
         <item name="android:textSize">14sp</item>
