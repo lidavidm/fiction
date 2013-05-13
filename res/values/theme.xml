@@ -34,6 +34,28 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
         <item name="android:textColor">@android:color/white</item>
         <item name="android:textAllCaps">true</item>
     </style>
+
+    <style name="Title">
+        <item name="android:textSize">28sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+    <style name="Subtitle">
+        <item name="android:textSize">20sp</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:ellipsize">marquee</item>
+        <item name="android:marqueeRepeatLimit">marquee_forever</item>
+        <item name="android:scrollHorizontally">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:focusableInTouchMode">true</item>
+        <item name="android:fontFamily">sans-serif-light</item>
+    </style>
+
     <style name="Minititle">
         <item name="android:textSize">14sp</item>
         <item name="android:singleLine">true</item>

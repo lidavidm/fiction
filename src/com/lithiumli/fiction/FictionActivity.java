@@ -28,6 +28,8 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ListView;
 
 import android.support.v4.content.LocalBroadcastManager;
@@ -111,6 +113,16 @@ abstract public class FictionActivity extends SlidingActivity
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mMessageReceiver);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        if (mBound) {
+            unbindService(mConnection);
+            mBound = false;
+        }
+    }
+
     public PlaybackService getService() {
         if (mBound) {
             Log.d("fiction", "bound");
@@ -124,5 +136,37 @@ abstract public class FictionActivity extends SlidingActivity
     // EVENTS
 
     public void onSongChange(Song song) {
+    }
+
+    public void playPauseButton(View view) {
+        PlaybackService service = getService();
+        ImageButton button = (ImageButton) view;
+        if (service.isPlaying()) {
+            service.pause();
+            button.setImageResource(R.drawable.ic_menu_play);
+        }
+        else {
+            service.unpause();
+
+            if (!service.isPlaying() && service.getQueue().getCount() > 0) {
+                service.play(0);
+            }
+            else {
+                // TODO: restore queue/queue everything and play
+                return;
+            }
+
+            button.setImageResource(R.drawable.ic_menu_pause);
+        }
+
+        button.invalidate();
+    }
+
+    public void prevButton(View view) {
+        getService().prev();
+    }
+
+    public void nextButton(View view) {
+        getService().next();
     }
 }
