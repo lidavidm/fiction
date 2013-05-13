@@ -26,6 +26,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -34,8 +35,9 @@ import android.util.Log;
 public class NowPlayingActivity
     extends FictionActivity
 {
-    TextView mTitle;
-    TextView mSubtitle;
+    TextView mSongName;
+    TextView mSongAlbum;
+    TextView mSongArtist;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -43,18 +45,34 @@ public class NowPlayingActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.now_playing);
 
-        mTitle = (TextView) findViewById(R.id.np_song_name);
-        mSubtitle = (TextView) findViewById(R.id.np_song_subtitle);
-        mSubtitle.setSelected(true);
+        mSongName = (TextView) findViewById(R.id.np_song_name);
+        mSongAlbum = (TextView) findViewById(R.id.np_song_album);
+        mSongArtist = (TextView) findViewById(R.id.np_song_artist);
+        mSongArtist.setSelected(true);
 
-        getActionBar().setSubtitle("Now Playing");
+        ActionBar ab = getActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setTitle("Now Playing");
+        ab.setSubtitle("Fiction Music");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            Intent parentIntent = new Intent(this, LibraryActivity.class);
+            parentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(parentIntent);
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onSongChange(Song song) {
-        getActionBar().setTitle(song.getArtist());
-
-        mTitle.setText(song.getTitle());
-        mSubtitle.setText(song.getArtist() + " - " + song.getAlbum());
+        mSongName.setText(song.getTitle());
+        mSongAlbum.setText(song.getAlbum());
+        mSongArtist.setText(song.getArtist());
     }
 }

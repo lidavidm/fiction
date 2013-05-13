@@ -95,6 +95,11 @@ abstract public class FictionActivity extends SlidingActivity
         mQueueListView = (ListView) findViewById(R.id.queue);
         mQueueListView.setFastScrollEnabled(true);
         mQueueListView.setFastScrollAlwaysVisible(true);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
 
         // Playback stuff
         Intent intent = new Intent(this, PlaybackService.class);
@@ -131,6 +136,10 @@ abstract public class FictionActivity extends SlidingActivity
 
         Log.d("fiction", "unbound");
         return null;
+    }
+
+    public boolean isServiceBound() {
+        return mBound;
     }
 
     // EVENTS

@@ -62,8 +62,11 @@ public class SongsListFragment
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         setEmptyText("No songs");
-        mAdapter = new SongsCursorAdapter(getActivity(), null, 0);
-        setListAdapter(mAdapter);
+
+        if (getListAdapter() == null) {
+            mAdapter = new SongsCursorAdapter(getActivity(), null, 0);
+            setListAdapter(mAdapter);
+        }
 
         getListView().setOnItemClickListener(this);
 
@@ -74,14 +77,19 @@ public class SongsListFragment
                             id) {
         Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                                                     id);
-        PlaybackService service = ((FictionActivity) getActivity())
-            .getService();
-        PlaybackQueue queue = service.getQueue();
-        if (queue.getContext() != PlaybackQueue.QueueContext.SONG) {
-            queue.setContext(PlaybackQueue.QueueContext.SONG,
-                             mAdapter.getCursor());
+
+        FictionActivity activity = (FictionActivity) getActivity();
+
+        if (activity.isServiceBound()) {
+            PlaybackService service = activity.getService();
+            PlaybackQueue queue = service.getQueue();
+
+            if (queue.getContext() != PlaybackQueue.QueueContext.SONG) {
+                queue.setContext(PlaybackQueue.QueueContext.SONG,
+                                 mAdapter.getCursor());
+            }
+            service.play(position);
         }
-        service.play(position);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

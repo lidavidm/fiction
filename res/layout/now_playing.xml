@@ -34,8 +34,15 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
               android:gravity="bottom"
               style="@style/Title"
               />
-    <TextView android:id="@+id/np_song_subtitle"
-              android:text="Artist — Album"
+    <TextView android:id="@+id/np_song_album"
+              android:text="Album"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center_vertical"
+              style="@style/Subtitle"
+              />
+    <TextView android:id="@+id/np_song_artist"
+              android:text="Artist"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:gravity="top"
