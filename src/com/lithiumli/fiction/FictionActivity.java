@@ -47,10 +47,15 @@ abstract public class FictionActivity extends SlidingActivity
                 PlaybackService.LocalBinder binder = (PlaybackService.LocalBinder) service;
                 mService = binder.getService();
                 mBound = true;
-                Log.d("fiction", "finished binding");
+                Log.d("fiction", "bound to service");
+
+                if (mService.getQueue().getCount() > 0) {
+                    onSongChange(mService.getQueue().getCurrent());
+                }
 
                 mAdapter = mService.getQueue().getAdapter(getApplicationContext());
                 mQueueListView.setAdapter(mAdapter);
+                mAdapter.notifyDataSetChanged();
             }
 
             public void onServiceDisconnected(ComponentName className) {
@@ -66,7 +71,6 @@ abstract public class FictionActivity extends SlidingActivity
             }
         };
 
-    /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState)
     {

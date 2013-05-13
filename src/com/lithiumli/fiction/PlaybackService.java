@@ -68,7 +68,9 @@ public class PlaybackService
     }
 
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mQueue = new PlaybackQueue();
+        if (mQueue == null) {
+            mQueue = new PlaybackQueue();
+        }
         return START_STICKY;
     }
 
