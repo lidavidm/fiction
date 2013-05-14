@@ -130,11 +130,9 @@ abstract public class FictionActivity extends SlidingActivity
 
     public PlaybackService getService() {
         if (mBound) {
-            Log.d("fiction", "bound");
             return mService;
         }
 
-        Log.d("fiction", "unbound");
         return null;
     }
 
