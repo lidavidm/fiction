@@ -28,7 +28,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.util.Log;
 
@@ -42,6 +44,7 @@ public class NowPlayingActivity
     TextView mSongAlbum;
     TextView mSongArtist;
     ViewPager mCoverPager;
+    CoverAdapter mAdapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -50,8 +53,10 @@ public class NowPlayingActivity
         setContentView(R.layout.now_playing);
 
         mCoverPager = (ViewPager) findViewById(R.id.cover_pager);
-        mCoverPager.setAdapter(adapter);
-        mCoverPager.setCurrentItem(CoverPager.COVER_MIDDLE, false);
+
+        mAdapter = new CoverAdapter(this, mCoverPager);
+        mCoverPager.setAdapter(mAdapter);
+        mCoverPager.setCurrentItem(CoverAdapter.COVER_MIDDLE, false);
 
         mSongName = (TextView) findViewById(R.id.np_song_name);
         mSongAlbum = (TextView) findViewById(R.id.np_song_album);
@@ -93,9 +98,16 @@ public class NowPlayingActivity
         private static final int COVER_MIDDLE = 1;
         private static final int COVER_RIGHT = 2;
 
+        FictionActivity mActivity;
+        ViewPager mPager;
         int mSelectedCoverIndex;
+        TextView[] mCovers = new TextView[3];
 
-        ImageView mCovers = new ImageView[3];
+        public CoverAdapter(FictionActivity activity, ViewPager pager) {
+            mActivity = activity;
+            mPager = pager;
+            mPager.setOnPageChangeListener(this);
+        }
 
         @Override
         public int getItemPosition(Object object) {
@@ -113,13 +125,13 @@ public class NowPlayingActivity
         }
 
         @Override
-        public ImageView instantiateItem(ViewGroup container, int position) {
-            // TextView textView = (TextView)mInflater.inflate(R.layout.content, null);
-            // PageModel currentPage = mPageModel[position];
-            // currentPage.textView = textView;
-            // textView.setText(currentPage.getText());
-            // container.addView(textView);
-            // return textView;
+        public TextView instantiateItem(ViewGroup container, int position) {
+            TextView view = new TextView(mActivity);
+            Song song = getSong(position - 1);
+            view.setText(song.getAlbum() + song.getTitle());
+            container.addView(view);
+            mCovers[position] = view;
+            return view;
         }
 
         @Override
@@ -128,16 +140,21 @@ public class NowPlayingActivity
         }
 
         private Song getSong(int offset) {
-            // get song info from queue
+            if (mActivity.isServiceBound()) {
+                PlaybackQueue queue = mActivity.getService().getQueue();
+                int position = queue.getCurrentPosition();
+                return queue.getItem(position + offset);
+            }
+            return null;
         }
 
         private void setCover(int cover, Song song) {
-            // set cover image
+            mCovers[cover].setText(song.getAlbum() + song.getTitle());
         }
 
         @Override
         public void onPageSelected(int position) {
-            mSelectedPageIndex = position;
+            mSelectedCoverIndex = position;
         }
 
         @Override
@@ -149,17 +166,23 @@ public class NowPlayingActivity
 
                 // swipe to right (left page)
                 if (mSelectedCoverIndex == COVER_LEFT) {
-                    setCover(COVER_RIGHT);
-                    setCover(COVER_MIDDLE);
-                    setCover(COVER_LEFT);
+                    setCover(COVER_RIGHT, getSong(-2));
+                    setCover(COVER_MIDDLE, prevSong);
+                    setCover(COVER_LEFT, currentSong);
+                    if (mActivity.isServiceBound()) {
+                        mActivity.getService().prev();
+                    }
                 }
                 // swipe to left (right page)
                 else if (mSelectedCoverIndex == COVER_RIGHT) {
-                    setCover(COVER_LEFT);
-                    setCover(COVER_MIDDLE);
-                    setCover(COVER_RIGHT);
+                    setCover(COVER_LEFT, currentSong);
+                    setCover(COVER_MIDDLE, nextSong);
+                    setCover(COVER_RIGHT, getSong(2));
+                    if (mActivity.isServiceBound()) {
+                        mActivity.getService().next();
+                    }
                 }
-                this.setCurrentItem(COVER_MIDDLE, false);
+                mPager.setCurrentItem(COVER_MIDDLE, false);
             }
         }
 
@@ -169,3 +192,4 @@ public class NowPlayingActivity
                                    int positionOffsetPixels) {
         }
     }
+}
