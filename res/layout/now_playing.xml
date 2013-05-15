@@ -53,15 +53,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                   android:layout_height="wrap_content"
                   android:orientation="horizontal"
                   >
-        <ImageButton android:id="@+id/np_previous"
-                     android:layout_width="0dp"
-                     android:layout_weight="1"
-                     android:layout_height="wrap_content"
-                     style="?android:attr/borderlessButtonStyle"
-                     android:src="@drawable/ic_menu_previous"
-                     android:onClick="prevButton"
-                     />
-
         <ImageButton android:id="@+id/np_play_pause"
                      android:layout_width="0dp"
                      android:layout_weight="1"
@@ -69,15 +60,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                      style="?android:attr/borderlessButtonStyle"
                      android:src="@drawable/ic_menu_play"
                      android:onClick="playPauseButton"
-                     />
-
-        <ImageButton android:id="@+id/np_next"
-                     android:layout_width="0dp"
-                     android:layout_weight="1"
-                     android:layout_height="wrap_content"
-                     style="?android:attr/borderlessButtonStyle"
-                     android:src="@drawable/ic_menu_next"
-                     android:onClick="nextButton"
                      />
     </LinearLayout>
 </LinearLayout>

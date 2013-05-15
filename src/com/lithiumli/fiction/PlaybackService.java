@@ -171,7 +171,6 @@ public class PlaybackService
     }
 
     public void pause() {
-        Log.d("fiction", "pausing");
         if (mMediaPlayer != null) {
             mMediaPlayer.pause();
             mPaused = true;
@@ -179,7 +178,6 @@ public class PlaybackService
     }
 
     public void unpause() {
-        Log.d("fiction", "unpausing");
         if (mMediaPlayer != null) {
             mMediaPlayer.start();
             mPaused = false;
