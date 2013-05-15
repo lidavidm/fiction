@@ -111,7 +111,7 @@ public class NowPlayingActivity
         int mSelectedCoverIndex;
         int mPrevCoverIndex;
         boolean mEvent = true;
-        TextView[] mCovers = new TextView[3];
+        ImageView[] mCovers = new ImageView[3];
 
         public CoverAdapter(FictionActivity activity, ViewPager pager) {
             mActivity = activity;
@@ -134,7 +134,7 @@ public class NowPlayingActivity
         }
 
         @Override
-        public TextView instantiateItem(ViewGroup container, int position) {
+        public ImageView instantiateItem(ViewGroup container, int position) {
             int offset = -1;
 
             if (isAtBeginning()) {
@@ -150,9 +150,13 @@ public class NowPlayingActivity
                 }
             }
 
-            TextView view = new TextView(mActivity);
+            ImageView view = new ImageView(mActivity);
             Song song = getSong(position + offset);
-            view.setText(song.getAlbum() + song.getTitle());
+            view.setImageURI(song.getAlbumArt());
+            if (view.getDrawable() == null) {
+                view.setImageURI(Song.DEFAULT_ALBUM);
+            }
+
             container.addView(view);
             mCovers[position] = view;
             return view;
@@ -169,11 +173,9 @@ public class NowPlayingActivity
                 int position = queue.getCurrentPosition();
 
                 if (position + offset < 0) {
-                    Log.d("fiction", "too low");
                     return null;
                 }
                 if (position + offset > (queue.getCount() - 1)) {
-                    Log.d("fiction", "too high");
                     return null;
                 }
 
@@ -183,9 +185,10 @@ public class NowPlayingActivity
         }
 
         private void setCover(int cover, Song song) {
-            if (song == null)
-                mCovers[cover].setText("BUG: no song!");
-            mCovers[cover].setText(song.getAlbum() + song.getTitle());
+            mCovers[cover].setImageURI(song.getAlbumArt());
+            if (mCovers[cover].getDrawable() == null) {
+                mCovers[cover].setImageURI(Song.DEFAULT_ALBUM);
+            }
         }
 
         public boolean isNearBeginning() {
@@ -235,7 +238,7 @@ public class NowPlayingActivity
         @Override
         public void onPageScrollStateChanged(int state) {
             if (!mEvent) return;
-
+            // TODO: better way to determine direction of swipe
             if (state == ViewPager.SCROLL_STATE_IDLE) {
                 Song prevSong = getSong(-1);
                 Song currentSong = getSong(0);

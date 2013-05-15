@@ -26,11 +26,14 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 
 public class Song implements Parcelable {
+    public static final Uri DEFAULT_ALBUM = Uri.parse("android.resource://com.lithiumli.fiction/" +
+                                                      R.drawable.filler_album);
+
     private Uri mUri;
     private String mTitle = "(No title)";
     private String mArtist = "(Unknown)";
     private String mAlbum = "(Unknown album)";
-    private Uri mAlbumArt = Uri.EMPTY;
+    private Uri mAlbumArt = DEFAULT_ALBUM;
     private long mDuration;
 
     public Song(Uri uri) {
