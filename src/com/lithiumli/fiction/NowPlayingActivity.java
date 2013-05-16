@@ -51,6 +51,7 @@ public class NowPlayingActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.now_playing);
+        initializeDrawer();
 
         mCoverPager = (ViewPager) findViewById(R.id.cover_pager);
 

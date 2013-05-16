@@ -25,21 +25,27 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
-import com.jeremyfeinstein.slidingmenu.lib.app.SlidingActivity;
-
-abstract public class FictionActivity extends SlidingActivity
+abstract public class FictionActivity extends Activity
 {
     ListView mQueueListView;
+    DrawerLayout mDrawer;
+    ActionBarDrawerToggle mDrawerToggle;
+    String mOldTitle;
+
     PlaybackQueue.QueueAdapter mAdapter;
 
     protected PlaybackService mService;
@@ -77,24 +83,43 @@ abstract public class FictionActivity extends SlidingActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+    }
 
-        setContentView(R.layout.main);
-
-        // Queue menu
-        SlidingMenu menu = getSlidingMenu();
-        menu.setMode(SlidingMenu.LEFT);
-        menu.setTouchModeAbove(SlidingMenu.TOUCHMODE_MARGIN);
-        menu.setShadowWidthRes(R.dimen.slidingmenu_shadow_width);
-        menu.setShadowDrawable(R.drawable.shadow);
-        menu.setBehindOffsetRes(R.dimen.slidingmenu_offset);
-        menu.setFadeDegree(0.35f);
-
-        setSlidingActionBarEnabled(false);
-        setBehindContentView(R.layout.queue);
-
+    public void initializeDrawer() {
         mQueueListView = (ListView) findViewById(R.id.queue);
         mQueueListView.setFastScrollEnabled(true);
         mQueueListView.setFastScrollAlwaysVisible(true);
+
+        mDrawer = (DrawerLayout) findViewById(R.id.drawer);
+        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer,
+                                                  R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
+                public void onDrawerClosed(View view) {
+                    getActionBar().setTitle(mOldTitle);
+                    invalidateOptionsMenu();
+                }
+
+                public void onDrawerOpened(View drawerView) {
+                    mOldTitle = (String) getActionBar().getTitle();
+                    getActionBar().setTitle("Queue");
+                    invalidateOptionsMenu();
+                }
+            };
+        mDrawer.setDrawerListener(mDrawerToggle);
+        mDrawer.setDrawerShadow(R.drawable.shadow, GravityCompat.START);
+        getActionBar().setDisplayHomeAsUpEnabled(true);
+        getActionBar().setHomeButtonEnabled(true);
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
     }
 
     @Override
@@ -126,6 +151,18 @@ abstract public class FictionActivity extends SlidingActivity
             unbindService(mConnection);
             mBound = false;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+        // Handle your other action bar items...
+
+        return super.onOptionsItemSelected(item);
     }
 
     public PlaybackService getService() {

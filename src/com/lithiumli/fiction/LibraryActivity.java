@@ -52,6 +52,8 @@ public class LibraryActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
+        initializeDrawer();
+
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
 
         mTabsAdapter = new TabsAdapter(this, mViewPager);
