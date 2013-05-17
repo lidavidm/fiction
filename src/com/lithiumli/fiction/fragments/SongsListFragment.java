@@ -43,6 +43,7 @@ import com.lithiumli.fiction.FictionActivity;
 import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.PlaybackQueue;
 import com.lithiumli.fiction.PlaybackService;
+import com.lithiumli.fiction.ui.SongsAlphabetIndexer;
 
 public class SongsListFragment
     extends ListFragment
@@ -98,7 +99,7 @@ public class SongsListFragment
         return new CursorLoader(getActivity(), uri,
                                 PROJECTION,
                                 select, null,
-                                MediaStore.Audio.Media.TITLE_KEY + " COLLATE UNICODE ASC");
+                                MediaStore.Audio.Media.TITLE_KEY);
     }
 
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
@@ -116,7 +117,7 @@ public class SongsListFragment
         private Cursor mCursor;
         private Context mContext;
         private final LayoutInflater mInflater;
-        private AlphabetIndexer mIndexer;
+        private SongsAlphabetIndexer mIndexer;
 
         public SongsCursorAdapter(Context context, Cursor c, int flags) {
             super(context, c, flags);
@@ -150,9 +151,9 @@ public class SongsListFragment
 
         public Cursor swapCursor(Cursor c) {
             if (c != null) {
-                mIndexer = new AlphabetIndexer(c,
-                                               c.getColumnIndex(MediaStore.Audio.Media.TITLE),
-                                               "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                mIndexer = new SongsAlphabetIndexer(c,
+                                                    c.getColumnIndex(MediaStore.Audio.Media.TITLE),
+                                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
             }
             return super.swapCursor(c);
         }
