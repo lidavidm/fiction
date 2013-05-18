@@ -16,5 +16,6 @@ more details.
 You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <resources>
-    <color name="songs_header">#FF8800</color>
+    <color name="songs_header">#BBB</color>
+    <color name="songs_background">#222</color>
 </resources>
