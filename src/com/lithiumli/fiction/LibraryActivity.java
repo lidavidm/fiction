@@ -55,9 +55,13 @@ public class LibraryActivity
         initializeDrawer();
 
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        mViewPager.setOnPageChangeListener(this);
 
         mTabsAdapter = new TabsAdapter(this, mViewPager);
-        mTabsAdapter.addTab("Songs", SongsListFragment.class, null);
+        mTabsAdapter.addTab("Songs", SongsListFragment.class, null,
+                            R.drawable.ab_background_textured_fiction);
+        mTabsAdapter.addTab("Playlists", PlaylistsListFragment.class, null,
+                            R.drawable.ab_background_textured_fiction_pl);
         mViewPager.setAdapter(mTabsAdapter);
 
         babSongTitle = (TextView) findViewById(R.id.bab_song_name);
@@ -88,6 +92,8 @@ public class LibraryActivity
     public void onPageSelected(int position) {
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(mTabsAdapter.getPageTitle(position));
+        TabsAdapter.TabInfo info = mTabsAdapter.getItemInfo(position);
+        actionBar.setBackgroundDrawable(getResources().getDrawable(info.bgResource));
     }
 
     @Override
@@ -104,15 +110,18 @@ public class LibraryActivity
         private final ViewPager mViewPager;
         private final ArrayList<TabInfo> mTabs = new ArrayList<TabInfo>();
 
-        static final class TabInfo {
-            private final Class<?> clss;
-            private final Bundle args;
-            private final String title;
+        public static final class TabInfo {
+            public final Class<?> clss;
+            public final Bundle args;
+            public final String title;
+            public final int bgResource;
 
-            TabInfo(Class<?> _class, Bundle _args, String _title) {
+            public TabInfo(Class<?> _class, Bundle _args, String _title,
+                           int _bgResource) {
                 clss = _class;
                 args = _args;
                 title = _title;
+                bgResource = _bgResource;
             }
         }
 
@@ -123,8 +132,8 @@ public class LibraryActivity
             mViewPager.setAdapter(this);
         }
 
-        public void addTab(String title, Class<?> clss, Bundle args) {
-            TabInfo info = new TabInfo(clss, args, title);
+        public void addTab(String title, Class<?> clss, Bundle args, int resource) {
+            TabInfo info = new TabInfo(clss, args, title, resource);
             mTabs.add(info);
             notifyDataSetChanged();
         }
@@ -138,6 +147,10 @@ public class LibraryActivity
         public Fragment getItem(int position) {
             TabInfo info = mTabs.get(position);
             return Fragment.instantiate(mContext, info.clss.getName(), info.args);
+        }
+
+        public TabInfo getItemInfo(int position) {
+            return mTabs.get(position);
         }
 
         @Override

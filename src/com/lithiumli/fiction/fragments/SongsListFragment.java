@@ -46,10 +46,7 @@ import com.lithiumli.fiction.PlaybackService;
 import com.lithiumli.fiction.ui.SongsAlphabetIndexer;
 
 public class SongsListFragment
-    extends ListFragment
-    implements LoaderManager.LoaderCallbacks<Cursor>,
-               AdapterView.OnItemClickListener {
-    SongsCursorAdapter mAdapter;
+    extends FictionListFragment {
     static final String[] PROJECTION = {
         MediaStore.Audio.Media._ID,
         MediaStore.Audio.Media.TITLE,
@@ -62,16 +59,11 @@ public class SongsListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        setEmptyText("No songs");
 
         if (getListAdapter() == null) {
             mAdapter = new SongsCursorAdapter(getActivity(), null, 0);
             setListAdapter(mAdapter);
         }
-
-        getListView().setOnItemClickListener(this);
-
-        getLoaderManager().initLoader(0, null, this);
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long
@@ -102,37 +94,15 @@ public class SongsListFragment
                                 MediaStore.Audio.Media.TITLE_KEY);
     }
 
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mAdapter.swapCursor(data);
-
-        getListView().setFastScrollEnabled(true);
-        getListView().setFastScrollAlwaysVisible(true);
-    }
-
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mAdapter.swapCursor(null);
-    }
-
-    public class SongsCursorAdapter extends CursorAdapter implements SectionIndexer {
-        private Cursor mCursor;
-        private Context mContext;
-        private final LayoutInflater mInflater;
+    class SongsCursorAdapter extends FictionCursorAdapter
+        implements SectionIndexer {
         private SongsAlphabetIndexer mIndexer;
 
         public SongsCursorAdapter(Context context, Cursor c, int flags) {
             super(context, c, flags);
-            mInflater = LayoutInflater.from(context);
-            mContext = context;
         }
 
         @Override
-        public View newView(Context context, Cursor cursor, ViewGroup
-                            parent) {
-            final View view = mInflater.inflate(R.layout.list_item,
-                                                parent, false);
-            return view;
-        }
-
         public void bindView(View view, Context context, Cursor cursor) {
             TextView title = (TextView) view.findViewById(R.id.title_text);
             TextView sub = (TextView) view.findViewById(R.id.sub_text);
@@ -149,6 +119,7 @@ public class SongsListFragment
             sub.setText(songArtist + " — " + songAlbum);
         }
 
+        @Override
         public Cursor swapCursor(Cursor c) {
             if (c != null) {
                 mIndexer = new SongsAlphabetIndexer(c,
@@ -158,14 +129,17 @@ public class SongsListFragment
             return super.swapCursor(c);
         }
 
+        @Override
         public int getPositionForSection(int section) {
             return mIndexer.getPositionForSection(section);
         }
 
+        @Override
         public int getSectionForPosition(int position) {
             return mIndexer.getSectionForPosition(position);
         }
 
+        @Override
         public Object[] getSections() {
             return mIndexer.getSections();
         }
