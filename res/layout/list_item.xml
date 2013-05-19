@@ -20,7 +20,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
               android:layout_height="wrap_content"
               android:mode="twoLine"
               android:orientation="vertical"
-              android:padding="4dp"
+              android:padding="@dimen/list_padding"
               >
 	<TextView android:id="@+id/title_text"
 		      android:layout_width="match_parent"
