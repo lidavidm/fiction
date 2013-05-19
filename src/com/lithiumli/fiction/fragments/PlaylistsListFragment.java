@@ -53,10 +53,9 @@ public class PlaylistsListFragment
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long
                             id) {
-        Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
-                                                    id);
-
+        Uri contentUri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
         Intent intent = new Intent(getActivity(), PlaylistsSublibraryActivity.class);
+        intent.putExtra(PlaylistsSublibraryActivity.DATA_URI, contentUri);
         startActivity(intent);
     }
 

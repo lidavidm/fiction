@@ -93,4 +93,9 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
         <item name="android:singleLine">true</item>
         <item name="android:fontFamily">sans-serif-light</item>
     </style>
+
+    <style name="ListButton" parent="@android:style/Widget.Holo.Button.Borderless">
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:layout_margin">0dp</item>
+    </style>
 </resources>

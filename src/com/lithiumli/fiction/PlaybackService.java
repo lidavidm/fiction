@@ -170,6 +170,7 @@ public class PlaybackService
 
         if (position <= mQueue.getCount()) {
             play(position + 1);
+            Log.d("fiction", "Next song");
         }
     }
 
@@ -178,6 +179,7 @@ public class PlaybackService
 
         if (position > 0) {
             play(position - 1);
+            Log.d("fiction", "Prev song");
         }
     }
 
@@ -185,11 +187,12 @@ public class PlaybackService
         if (mMediaPlayer != null) {
             mMediaPlayer.pause();
             mPaused = true;
-        }
+            Log.d("fiction", "Pausing");
 
-        Intent intent = new Intent(EVENT_PLAY_STATE);
-        intent.putExtra(DATA_STATE, PlayState.PAUSED.name());
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            Intent intent = new Intent(EVENT_PLAY_STATE);
+            intent.putExtra(DATA_STATE, PlayState.PAUSED.name());
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        }
     }
 
     public void unpause() {

@@ -19,4 +19,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     <string name="app_name">Fiction Music</string>
     <string name="drawer_open">Open Queue</string>
     <string name="drawer_close">Close Queue</string>
+
+    <string name="play_all">Play All</string>
+    <string name="enqueue_all">Enqueue All</string>
 </resources>

@@ -18,26 +18,43 @@
 
 package com.lithiumli.fiction;
 
-import android.app.Activity;
 import android.app.ActionBar;
-import android.app.Fragment;
+import android.app.LoaderManager;
 import android.os.Bundle;
 import android.content.Context;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
-import android.util.Log;
+import android.widget.Button;
+import android.widget.ListView;
 
+import android.widget.TextView;
 import com.lithiumli.fiction.fragments.*;
 
 public class PlaylistsSublibraryActivity
     extends SublibraryActivity
+    implements LoaderManager.LoaderCallbacks<Cursor>
 {
-    TextView babSongTitle;
-    TextView babSubtitle;
+    public static final String DATA_URI = "com.lithiumli.fiction.PLAYLIST_URI";
+
+    static final String[] PROJECTION = new String[] {
+            MediaStore.Audio.Playlists.Members._ID,
+            MediaStore.Audio.Playlists.Members.TITLE,
+            MediaStore.Audio.Playlists.Members.ARTIST,
+            MediaStore.Audio.Playlists.Members.ALBUM,
+            MediaStore.Audio.Playlists.Members.AUDIO_ID,
+            MediaStore.Audio.Playlists.Members.PLAY_ORDER
+    };
+
+    ListView mListView;
+    FictionCursorAdapter mAdapter;
+    Uri mUri;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -45,9 +62,37 @@ public class PlaylistsSublibraryActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playlists);
 
+        mUri = getIntent().getParcelableExtra(DATA_URI);
+
         ActionBar ab = getActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setTitle("Playlist");
+
+        mListView = (ListView) findViewById(R.id.playlist_list);
+
+        getLoaderManager().initLoader(0, null, this);
+
+        if (mListView.getAdapter() == null) {
+            mAdapter = new FictionCursorAdapter(this, null, 0) {
+                @Override
+                public void bindView(View view, Context context, Cursor cursor) {
+                    TextView title = (TextView) view.findViewById(R.id.title_text);
+                    TextView sub = (TextView) view.findViewById(R.id.sub_text);
+
+                    String songTitle =
+                            cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.TITLE));
+                    String songArtist =
+                            cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.ARTIST));
+                    String songAlbum =
+                            cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.Members.ALBUM));
+
+                    title.setText(songTitle);
+
+                    sub.setText(songArtist + " — " + songAlbum);
+                }
+            };
+            mListView.setAdapter(mAdapter);
+        }
     }
 
     @Override
@@ -57,9 +102,25 @@ public class PlaylistsSublibraryActivity
             Intent parentIntent = new Intent(this, LibraryActivity.class);
             parentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(parentIntent);
-            finish();
-            return true;
+            break;
+        default:
+            return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
+        return true;
+    }
+
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return new CursorLoader(this, mUri,
+                PROJECTION,
+                "", null,
+                MediaStore.Audio.Playlists.Members.PLAY_ORDER);
+    }
+
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+    }
+
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 }

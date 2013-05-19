@@ -39,7 +39,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
-abstract public class FictionActivity extends Activity
+abstract public class  FictionActivity extends Activity
 {
     ListView mQueueListView;
     DrawerLayout mDrawer;
@@ -135,6 +135,8 @@ abstract public class FictionActivity extends Activity
     @Override
     public void onResume() {
         super.onResume();
+
+        Log.d("fiction", "resuming");
 
         // Playback stuff
         Intent intent = new Intent(this, PlaybackService.class);

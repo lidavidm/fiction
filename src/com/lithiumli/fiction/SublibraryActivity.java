@@ -18,27 +18,16 @@
 
 package com.lithiumli.fiction;
 
-import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.os.Bundle;
-import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.ImageButton;
-import android.util.Log;
 
-import com.lithiumli.fiction.fragments.*;
 
 public class SublibraryActivity
     extends FictionActivity
 {
-    TextView babSongTitle;
-    TextView babSubtitle;
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
@@ -46,10 +35,6 @@ public class SublibraryActivity
         setContentView(R.layout.main);
 
         initializeDrawer(false);
-
-        babSongTitle = (TextView) findViewById(R.id.bab_song_name);
-        babSubtitle = (TextView) findViewById(R.id.bab_song_subtitle);
-        babSubtitle.setSelected(true);
 
         getActionBar().setSubtitle("Fiction Music");
 
@@ -66,8 +51,8 @@ public class SublibraryActivity
 
     @Override
     public void onSongChange(Song song) {
-        babSongTitle.setText(song.getTitle());
-        babSubtitle.setText(song.getArtist() + " - " + song.getAlbum());
+        ((TextView) findViewById(R.id.bab_song_name)).setText(song.getTitle());
+        ((TextView) findViewById(R.id.bab_song_subtitle)).setText(song.getArtist() + " - " + song.getAlbum());
     }
 
     @Override
