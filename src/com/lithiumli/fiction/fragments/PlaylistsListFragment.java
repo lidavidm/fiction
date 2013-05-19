@@ -21,6 +21,7 @@ package com.lithiumli.fiction.fragments;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -30,6 +31,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
+import com.lithiumli.fiction.PlaylistsSublibraryActivity;
 import com.lithiumli.fiction.R;
 
 public class PlaylistsListFragment
@@ -53,6 +55,9 @@ public class PlaylistsListFragment
                             id) {
         Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
                                                     id);
+
+        Intent intent = new Intent(getActivity(), PlaylistsSublibraryActivity.class);
+        startActivity(intent);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

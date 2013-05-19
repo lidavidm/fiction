@@ -74,8 +74,16 @@ abstract public class FictionActivity extends Activity
     private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                Song song = intent.getParcelableExtra(PlaybackService.DATA_SONG);
-                FictionActivity.this.onSongChange(song);
+                String action = intent.getAction();
+                if (action == PlaybackService.EVENT_PLAYING) {
+                    Song song = intent.getParcelableExtra(PlaybackService.DATA_SONG);
+                    FictionActivity.this.onSongChange(song);
+                }
+                else if (action == PlaybackService.EVENT_PLAY_STATE) {
+                    PlaybackService.PlayState state =
+                        PlaybackService.PlayState.valueOf(intent.getStringExtra(PlaybackService.DATA_STATE));
+                    FictionActivity.this.onPlayStateChange(state);
+                }
             }
         };
 
@@ -85,7 +93,7 @@ abstract public class FictionActivity extends Activity
         super.onCreate(savedInstanceState);
     }
 
-    public void initializeDrawer() {
+    public void initializeDrawer(boolean indicator) {
         mQueueListView = (ListView) findViewById(R.id.queue);
         mQueueListView.setFastScrollEnabled(true);
         mQueueListView.setFastScrollAlwaysVisible(true);
@@ -106,6 +114,8 @@ abstract public class FictionActivity extends Activity
             };
         mDrawer.setDrawerListener(mDrawerToggle);
         mDrawer.setDrawerShadow(R.drawable.shadow, GravityCompat.START);
+        mDrawerToggle.setDrawerIndicatorEnabled(indicator);
+
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
     }
@@ -133,8 +143,11 @@ abstract public class FictionActivity extends Activity
         intent = new Intent(this, PlaybackService.class);
         bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(PlaybackService.EVENT_PLAYING);
+        filter.addAction(PlaybackService.EVENT_PLAY_STATE);
         LocalBroadcastManager.getInstance(this).registerReceiver(mMessageReceiver,
-                                                                 new IntentFilter(PlaybackService.EVENT_PLAYING));
+                                                                 filter);
     }
 
     @Override
@@ -182,12 +195,14 @@ abstract public class FictionActivity extends Activity
     public void onSongChange(Song song) {
     }
 
+    public void onPlayStateChange(PlaybackService.PlayState state) {
+    }
+
     public void playPauseButton(View view) {
         PlaybackService service = getService();
         ImageButton button = (ImageButton) view;
         if (service.isPlaying()) {
             service.pause();
-            button.setImageResource(R.drawable.ic_menu_play);
         }
         else {
             service.unpause();
@@ -199,8 +214,6 @@ abstract public class FictionActivity extends Activity
                 // TODO: restore queue/queue everything and play
                 return;
             }
-
-            button.setImageResource(R.drawable.ic_menu_pause);
         }
 
         button.invalidate();

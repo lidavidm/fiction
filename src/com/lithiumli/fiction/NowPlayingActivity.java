@@ -51,7 +51,7 @@ public class NowPlayingActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.now_playing);
-        initializeDrawer();
+        initializeDrawer(false);
 
         mCoverPager = (ViewPager) findViewById(R.id.cover_pager);
 
@@ -93,6 +93,22 @@ public class NowPlayingActivity
         mSongName.setText(song.getTitle());
         mSongAlbum.setText(song.getAlbum());
         mSongArtist.setText(song.getArtist());
+    }
+
+    @Override
+    public void onPlayStateChange(PlaybackService.PlayState state) {
+        ImageButton button = (ImageButton) findViewById(R.id.np_play_pause);
+
+        switch (state) {
+        case PLAYING:
+            button.setImageResource(R.drawable.ic_menu_pause);
+            break;
+        case PAUSED:
+            button.setImageResource(R.drawable.ic_menu_play);
+            break;
+        default:
+            break;
+        }
     }
 
     // with thanks to

@@ -50,9 +50,17 @@ public class PlaybackService
     implements MediaPlayer.OnPreparedListener,
                MediaPlayer.OnCompletionListener {
     public static final String EVENT_PLAYING = "com.lithiumli.fiction.PLAYING";
+    public static final String EVENT_PLAY_STATE = "com.lithiumli.fiction.PLAY_STATE";
     public static final String DATA_SONG = "com.lithiumli.fiction.SONG";
+    public static final String DATA_STATE = "com.lithiumli.fiction.STATE";
 
     private static final int NOTIFICATION_PLAYING = 0;
+
+    public enum PlayState {
+        PLAYING,
+        PAUSED,
+        STOPPED
+    }
 
     MediaPlayer mMediaPlayer;
     MediaPlayer mNextPlayer;
@@ -140,6 +148,9 @@ public class PlaybackService
         Intent intent = new Intent(EVENT_PLAYING);
         intent.putExtra(DATA_SONG, song);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        intent = new Intent(EVENT_PLAY_STATE);
+        intent.putExtra(DATA_STATE, PlayState.PLAYING.name());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
 
         Log.d("fiction", "Playing new song");
         try {
@@ -175,6 +186,10 @@ public class PlaybackService
             mMediaPlayer.pause();
             mPaused = true;
         }
+
+        Intent intent = new Intent(EVENT_PLAY_STATE);
+        intent.putExtra(DATA_STATE, PlayState.PAUSED.name());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public void unpause() {
@@ -182,6 +197,10 @@ public class PlaybackService
             mMediaPlayer.start();
             mPaused = false;
         }
+
+        Intent intent = new Intent(EVENT_PLAY_STATE);
+        intent.putExtra(DATA_STATE, PlayState.PLAYING.name());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 
     public boolean isPlaying() {

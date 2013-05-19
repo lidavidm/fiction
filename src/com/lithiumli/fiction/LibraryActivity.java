@@ -24,11 +24,9 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
-import android.util.Log;
+import android.widget.ImageButton;
 
 import android.support.v4.view.ViewPager;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -52,7 +50,7 @@ public class LibraryActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
 
-        initializeDrawer();
+        initializeDrawer(true);
 
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setOnPageChangeListener(this);
@@ -86,6 +84,22 @@ public class LibraryActivity
     public void onSongChange(Song song) {
         babSongTitle.setText(song.getTitle());
         babSubtitle.setText(song.getArtist() + " - " + song.getAlbum());
+    }
+
+    @Override
+    public void onPlayStateChange(PlaybackService.PlayState state) {
+        ImageButton button = (ImageButton) findViewById(R.id.bab_play_pause);
+
+        switch (state) {
+        case PLAYING:
+            button.setImageResource(R.drawable.ic_menu_pause);
+            break;
+        case PAUSED:
+            button.setImageResource(R.drawable.ic_menu_play);
+            break;
+        default:
+            break;
+        }
     }
 
     @Override

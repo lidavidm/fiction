@@ -18,6 +18,10 @@
                   android:label="@string/app_name"
                   android:theme="@style/Theme.Fiction.NowPlaying">
         </activity>
+        <activity android:name="PlaylistsSublibraryActivity"
+                  android:label="@string/app_name"
+                  android:theme="@style/Theme.Fiction.Playlists">
+        </activity>
         <service android:name="PlaybackService" />
     </application>
 </manifest>
