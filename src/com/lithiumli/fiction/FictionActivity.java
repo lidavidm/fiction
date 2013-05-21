@@ -39,7 +39,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
-abstract public class  FictionActivity extends Activity
+abstract public class FictionActivity extends Activity
 {
     ListView mQueueListView;
     DrawerLayout mDrawer;
@@ -64,6 +64,8 @@ abstract public class  FictionActivity extends Activity
                 mAdapter = mService.getQueue().getAdapter(getApplicationContext());
                 mQueueListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
+
+                FictionActivity.this.onServiceConnected(mService);
             }
 
             public void onServiceDisconnected(ComponentName className) {
@@ -193,6 +195,9 @@ abstract public class  FictionActivity extends Activity
     }
 
     // EVENTS
+
+    public void onServiceConnected(PlaybackService service) {
+    }
 
     public void onSongChange(Song song) {
     }
