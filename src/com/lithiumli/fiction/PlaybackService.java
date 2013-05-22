@@ -36,6 +36,7 @@ import android.os.Messenger;
 import android.os.PowerManager;
 import android.os.RemoteException;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import android.support.v4.content.LocalBroadcastManager;
 
@@ -53,6 +54,10 @@ public class PlaybackService
     public static final String EVENT_PLAY_STATE = "com.lithiumli.fiction.PLAY_STATE";
     public static final String DATA_SONG = "com.lithiumli.fiction.SONG";
     public static final String DATA_STATE = "com.lithiumli.fiction.STATE";
+    public static final String ACTION_PREV = "com.lithiumli.fiction.notification.PREV";
+    public static final String ACTION_PLAY_PAUSE = "com.lithiumli.fiction.notification.PLAY_PAUSE";
+    public static final String ACTION_NEXT = "com.lithiumli.fiction.notification.NEXT";
+
 
     private static final int NOTIFICATION_PLAYING = 0;
 
@@ -65,7 +70,6 @@ public class PlaybackService
     MediaPlayer mMediaPlayer;
     MediaPlayer mNextPlayer;
     boolean mPaused = false;
-    Song mCurrentSong;
     PlaybackQueue mQueue;
     public final IBinder mBinder = new LocalBinder();
 
@@ -78,6 +82,24 @@ public class PlaybackService
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (mQueue == null) {
             mQueue = new PlaybackQueue();
+        }
+
+        if (intent != null && intent.getAction() != null) {
+            String action = intent.getAction();
+            if (action.equals(ACTION_PLAY_PAUSE)) {
+                if (mPaused) {
+                    unpause();
+                }
+                else {
+                    pause();
+                }
+            }
+            else if (action.equals(ACTION_PREV)) {
+                this.prev();
+            }
+            else if (action.equals(ACTION_NEXT)) {
+                this.next();
+            }
         }
         return START_STICKY;
     }
@@ -192,6 +214,8 @@ public class PlaybackService
             Intent intent = new Intent(EVENT_PLAY_STATE);
             intent.putExtra(DATA_STATE, PlayState.PAUSED.name());
             LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+            showNotification();
         }
     }
 
@@ -199,11 +223,13 @@ public class PlaybackService
         if (mMediaPlayer != null) {
             mMediaPlayer.start();
             mPaused = false;
-        }
 
-        Intent intent = new Intent(EVENT_PLAY_STATE);
-        intent.putExtra(DATA_STATE, PlayState.PLAYING.name());
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            Intent intent = new Intent(EVENT_PLAY_STATE);
+            intent.putExtra(DATA_STATE, PlayState.PLAYING.name());
+            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+            showNotification();
+        }
     }
 
     public boolean isPlaying() {
@@ -246,47 +272,78 @@ public class PlaybackService
     }
 
     private void showNotification() {
-        // Intent launchPlaybackIntent = new Intent(getApplicationContext(),
-        //                                          FictionPlaybackActivity.class);
-        // launchPlaybackIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
-        //                               Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        // PendingIntent pi = PendingIntent.getActivity(
-        //     getApplicationContext(),
-        //     0,
-        //     launchPlaybackIntent,
-        //     PendingIntent.FLAG_UPDATE_CURRENT);
+        Intent launchPlaybackIntent = new Intent(getApplicationContext(),
+                                                 NowPlayingActivity.class);
+        launchPlaybackIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+                                      Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pi = PendingIntent.getActivity(
+            getApplicationContext(),
+            0,
+            launchPlaybackIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // String title = "(unknown title)";
-        // if (mCurrentSong != null) {
-        //     title = mCurrentSong.getTitle();
-        // }
+        String title = "(unknown title)";
+        String artist = "(unknown artist)";
+        String album = "(unknown album)";
+        Uri albumArt = Song.DEFAULT_ALBUM;
+        if (mQueue.getCount() != 0) {
+            Song song = mQueue.getCurrent();
+            title = song.getTitle();
+            artist = song.getArtist();
+            album = song.getAlbum();
+            albumArt = song.getAlbumArt();
 
-        // Intent intent = new Intent(FictionMusicPlayerService.ACTION_PAUSE,
-        //                            Uri.EMPTY,
-        //                            getApplicationContext(),
-        //                            PlaybackService.class);
+            // TODO see ImageView.resolveUri for a working method
+            // if (albumArt.getPath() == null) {
+            //     albumArt = Song.DEFAULT_ALBUM;
+            // }
+        }
 
-        // Notification.Builder builder = new Notification.Builder(getApplicationContext());
-        // builder
-        //     .setSmallIcon(R.drawable.av_play)
-        //     .setContentTitle(title)
-        //     .setContentText("playing")
-        //     .setOngoing(true)
-        //     .setContentIntent(pi)
-        //     .addAction(R.drawable.av_pause, "Pause",
-        //                PendingIntent.getService(getApplicationContext(),
-        //                                         0,
-        //                                         intent,
-        //                                         0));
-        // Notification notification = builder.build();
+        Notification.Builder builder = new Notification.Builder(getApplicationContext());
+        builder
+            .setSmallIcon(R.drawable.ic_menu_play)
+            .setContentTitle("Playing" + title)
+            .setOngoing(true)
+            .setContentIntent(pi);
+        Notification notification = builder.build();
 
-        // startForeground(NOTIFICATION_PLAYING, notification);
-        // ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-        //     .notify(NOTIFICATION_PLAYING, notification);
+        RemoteViews customView = new RemoteViews(getPackageName(),
+                                                 R.layout.notification);
+        customView.setImageViewUri(R.id.notification_cover, albumArt);
+        customView.setTextViewText(R.id.notification_title, title);
+        customView.setTextViewText(R.id.notification_subtitle, artist);
+        notification.contentView = customView;
+
+        customView = new RemoteViews(getPackageName(),
+                                     R.layout.notification_big);
+        customView.setImageViewUri(R.id.notification_cover, albumArt);
+        customView.setImageViewResource(R.id.notification_play_pause,
+                                        mPaused ? R.drawable.ic_menu_play : R.drawable.ic_menu_pause);
+        customView.setTextViewText(R.id.notification_title, title);
+        customView.setTextViewText(R.id.notification_album, album);
+        customView.setTextViewText(R.id.notification_artist, artist);
+        customView.setOnClickPendingIntent(R.id.notification_previous, createAction(ACTION_PREV));
+        customView.setOnClickPendingIntent(R.id.notification_play_pause, createAction(ACTION_PLAY_PAUSE));
+        customView.setOnClickPendingIntent(R.id.notification_next, createAction(ACTION_NEXT));
+        notification.bigContentView = customView;
+
+        startForeground(NOTIFICATION_PLAYING, notification);
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+            .notify(NOTIFICATION_PLAYING, notification);
+    }
+
+    private PendingIntent createAction(String action) {
+        Intent actionIntent = new Intent(getApplicationContext(),
+                                         PlaybackService.class);
+        actionIntent.setAction(action);
+        PendingIntent pit = PendingIntent.getService(getApplicationContext(),
+                                                     0,
+                                                     actionIntent, 0);
+        return pit;
     }
 
     private void hideNotification() {
-        // ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
-        //     .cancel(NOTIFICATION_PLAYING);
+        ((NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE))
+            .cancel(NOTIFICATION_PLAYING);
     }
 }
