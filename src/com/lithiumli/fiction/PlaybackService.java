@@ -57,8 +57,6 @@ public class PlaybackService
     public static final String ACTION_PREV = "com.lithiumli.fiction.notification.PREV";
     public static final String ACTION_PLAY_PAUSE = "com.lithiumli.fiction.notification.PLAY_PAUSE";
     public static final String ACTION_NEXT = "com.lithiumli.fiction.notification.NEXT";
-
-
     private static final int NOTIFICATION_PLAYING = 0;
 
     public enum PlayState {
@@ -67,9 +65,17 @@ public class PlaybackService
         STOPPED
     }
 
+    public enum RepeatMode {
+        NO_REPEAT,
+        REPEAT_ALL,
+        REPEAT_ONE
+    }
+
     MediaPlayer mMediaPlayer;
     MediaPlayer mNextPlayer;
     boolean mPaused = false;
+    boolean mShuffle = false;
+    RepeatMode mRepeat;
     PlaybackQueue mQueue;
     public final IBinder mBinder = new LocalBinder();
 

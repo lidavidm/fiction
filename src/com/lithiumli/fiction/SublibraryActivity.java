@@ -23,17 +23,16 @@ import android.content.Intent;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.ImageButton;
+import android.util.Log;
 
 
-public class SublibraryActivity
+abstract public class SublibraryActivity
     extends FictionActivity
 {
     @Override
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
-
         initializeDrawer(false);
 
         getActionBar().setSubtitle("Fiction Music");
@@ -47,6 +46,7 @@ public class SublibraryActivity
                     SublibraryActivity.this.startActivity(intent);
                 }
             });
+        Log.d("fiction", "sublibrary init");
     }
 
     @Override

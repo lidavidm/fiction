@@ -31,6 +31,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
@@ -39,7 +40,8 @@ import com.lithiumli.fiction.fragments.*;
 
 public class PlaylistsSublibraryActivity
     extends SublibraryActivity
-    implements LoaderManager.LoaderCallbacks<Cursor>
+    implements LoaderManager.LoaderCallbacks<Cursor>,
+               AdapterView.OnItemClickListener
 {
     public static final String DATA_URI = "com.lithiumli.fiction.PLAYLIST_URI";
 
@@ -48,7 +50,9 @@ public class PlaylistsSublibraryActivity
             MediaStore.Audio.Playlists.Members.TITLE,
             MediaStore.Audio.Playlists.Members.ARTIST,
             MediaStore.Audio.Playlists.Members.ALBUM,
+            MediaStore.Audio.Playlists.Members.ALBUM_ID,
             MediaStore.Audio.Playlists.Members.AUDIO_ID,
+            MediaStore.Audio.Playlists.Members.DURATION,
             MediaStore.Audio.Playlists.Members.PLAY_ORDER
     };
 
@@ -69,6 +73,7 @@ public class PlaylistsSublibraryActivity
         ab.setTitle("Playlist");
 
         mListView = (ListView) findViewById(R.id.playlist_list);
+        mListView.setOnItemClickListener(this);
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -92,6 +97,23 @@ public class PlaylistsSublibraryActivity
                 }
             };
             mListView.setAdapter(mAdapter);
+        }
+    }
+
+    public void onItemClick(AdapterView<?> parent, View view, int position, long
+                            id) {
+        if (isServiceBound()) {
+            PlaybackService service = getService();
+            PlaybackQueue queue = service.getQueue();
+
+            // TODO also set context if different playlist
+            // QueueContext needs to hold context info about which playlist,
+            // etc, not just the type of queue
+            if (queue.getContext() != PlaybackQueue.QueueContext.PLAYLIST) {
+                queue.setContext(PlaybackQueue.QueueContext.PLAYLIST,
+                                 mAdapter.getCursor());
+            }
+            service.play(position);
         }
     }
 

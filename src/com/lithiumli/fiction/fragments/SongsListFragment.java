@@ -18,7 +18,6 @@
 
 package com.lithiumli.fiction.fragments;
 
-import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -60,9 +59,6 @@ public class SongsListFragment
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long
                             id) {
-        Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                                                    id);
-
         FictionActivity activity = (FictionActivity) getActivity();
 
         if (activity.isServiceBound()) {
@@ -87,7 +83,8 @@ public class SongsListFragment
     }
 
     class SongsCursorAdapter extends FictionCursorAdapter
-        implements SectionIndexer {
+        // implements SectionIndexer
+    {
         private SongsAlphabetIndexer mIndexer;
 
         public SongsCursorAdapter(Context context, Cursor c, int flags) {
@@ -113,27 +110,27 @@ public class SongsListFragment
 
         @Override
         public Cursor swapCursor(Cursor c) {
-            if (c != null) {
-                mIndexer = new SongsAlphabetIndexer(c,
-                                                    c.getColumnIndex(MediaStore.Audio.Media.TITLE),
-                                                    "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-            }
+            // if (c != null) {
+            //     mIndexer = new SongsAlphabetIndexer(c,
+            //                                         c.getColumnIndex(MediaStore.Audio.Media.TITLE),
+            //                                         "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            // }
             return super.swapCursor(c);
         }
 
-        @Override
-        public int getPositionForSection(int section) {
-            return mIndexer.getPositionForSection(section);
-        }
+        // @Override
+        // public int getPositionForSection(int section) {
+        //     return mIndexer.getPositionForSection(section);
+        // }
 
-        @Override
-        public int getSectionForPosition(int position) {
-            return mIndexer.getSectionForPosition(position);
-        }
+        // @Override
+        // public int getSectionForPosition(int position) {
+        //     return mIndexer.getSectionForPosition(position);
+        // }
 
-        @Override
-        public Object[] getSections() {
-            return mIndexer.getSections();
-        }
+        // @Override
+        // public Object[] getSections() {
+        //     return mIndexer.getSections();
+        // }
     }
 }

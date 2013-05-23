@@ -82,6 +82,20 @@ public class PlaybackQueue {
                 }
             }
             break;
+        case PLAYLIST:
+            if (data.moveToFirst()){
+                while(!data.isAfterLast()) {
+                    long id = data.getLong(data.getColumnIndex(MediaStore.Audio.Playlists.Members.AUDIO_ID));
+                    Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                                                                id);
+                    Song song = new Song(contentUri);
+                    song.populate(data);
+                    mSongs.add(song);
+
+                    data.moveToNext();
+                }
+            }
+            break;
         default:
             break;
         }
