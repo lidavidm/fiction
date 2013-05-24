@@ -32,6 +32,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class PlaybackQueue {
     public enum QueueContext {
@@ -47,8 +48,10 @@ public class PlaybackQueue {
 
     QueueContext mQueueContext;
     ArrayList<Song> mSongs = new ArrayList<Song>(10);
+    ArrayList<Song> mSongsOriginal = new ArrayList<Song>(10);
     Cursor mCursor;
     int mCurrent;
+    boolean mShuffle = false;
 
     QueueAdapter mAdapter;
 
@@ -61,6 +64,9 @@ public class PlaybackQueue {
 
     public void setContext(QueueContext context, Cursor data) {
         mQueueContext = context;
+
+        mSongs.clear();
+        mSongsOriginal = null;
 
         switch (context) {
         case SONG:
@@ -99,6 +105,10 @@ public class PlaybackQueue {
         if (mAdapter != null) {
             mAdapter.notifyDataSetChanged();
         }
+
+        if (mShuffle) {
+            shuffle();
+        }
     }
 
     public int getCount() {
@@ -121,6 +131,36 @@ public class PlaybackQueue {
         assert position < mSongs.size() && position >= 0 : "Invalid queue position";
 
         mCurrent = position;
+    }
+
+    public void shuffle() {
+        mShuffle = true;
+        Song current = getCurrent();
+
+        mSongsOriginal = new ArrayList<Song>(mSongs);
+        Collections.shuffle(mSongs);
+
+        int index = mSongs.indexOf(current);
+        if (index != -1) {
+            setCurrent(index);
+        }
+    }
+
+    public void restoreShuffle() {
+        mShuffle = false;
+        Song current = getCurrent();
+
+        mSongs = mSongsOriginal;
+        mSongsOriginal = null;
+
+        int index = mSongs.indexOf(current);
+        if (index != -1) {
+            setCurrent(index);
+        }
+    }
+
+    public boolean isShuffling() {
+        return mShuffle;
     }
 
     public QueueAdapter getAdapter(Context context) {

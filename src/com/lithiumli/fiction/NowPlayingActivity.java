@@ -114,6 +114,24 @@ public class NowPlayingActivity
         }
     }
 
+    public void shuffleButton(View view) {
+        ImageButton button = (ImageButton) view;
+
+        if (isServiceBound()) {
+            PlaybackService service = getService();
+            PlaybackQueue queue = service.getQueue();
+
+            if (queue.isShuffling()) {
+                button.setColorFilter(0xFFFFFFFF);
+                queue.restoreShuffle();
+            }
+            else {
+                button.setColorFilter(0xFF0099CC);
+                queue.shuffle();
+            }
+        }
+    }
+
     // with thanks to
     // thehayro.blogspot.com/2012/12/enable-infinite-paging-with-android.html
     public class CoverAdapter

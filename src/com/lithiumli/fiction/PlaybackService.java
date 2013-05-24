@@ -74,7 +74,6 @@ public class PlaybackService
     MediaPlayer mMediaPlayer;
     MediaPlayer mNextPlayer;
     boolean mPaused = false;
-    boolean mShuffle = false;
     RepeatMode mRepeat;
     PlaybackQueue mQueue;
     public final IBinder mBinder = new LocalBinder();
