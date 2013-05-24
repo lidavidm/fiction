@@ -112,6 +112,19 @@ abstract public class FictionActivity extends Activity
                     mOldTitle = (String) getActionBar().getTitle();
                     getActionBar().setTitle("Queue");
                     invalidateOptionsMenu();
+
+                    if (mAdapter != null) {
+                        mAdapter.notifyDataSetChanged();
+                    }
+
+                    if (isServiceBound()) {
+                        PlaybackService service = getService();
+                        PlaybackQueue queue = service.getQueue();
+
+                        if (queue.getCount() != 0) {
+                            mQueueListView.setSelection(queue.getCurrentPosition());
+                        }
+                    }
                 }
             };
         mDrawer.setDrawerListener(mDrawerToggle);
@@ -120,6 +133,18 @@ abstract public class FictionActivity extends Activity
 
         getActionBar().setDisplayHomeAsUpEnabled(true);
         getActionBar().setHomeButtonEnabled(true);
+    }
+
+    public void initializeBottomActionBar() {
+        View layout = findViewById(R.id.bab_info);
+        layout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(FictionActivity.this,
+                                               NowPlayingActivity.class);
+                    FictionActivity.this.startActivity(intent);
+                }
+            });
     }
 
     @Override

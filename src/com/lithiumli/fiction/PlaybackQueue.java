@@ -60,10 +60,6 @@ public class PlaybackQueue {
     }
 
     public void setContext(QueueContext context, Cursor data) {
-        if (mQueueContext == context) {
-            return;
-        }
-
         mQueueContext = context;
 
         switch (context) {
@@ -166,19 +162,30 @@ public class PlaybackQueue {
         @Override
         public View getView(int position, View convertView,
                             ViewGroup parent) {
-            LayoutInflater inflater = (LayoutInflater)
-                mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater)
+                    mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+                convertView = inflater.inflate(R.layout.list_item, parent, false);
+            }
+
             Song song = getItem(position);
 
-            View view = inflater.inflate(R.layout.list_item, parent, false);
-
-            TextView title = (TextView) view.findViewById(R.id.title_text);
-            TextView sub = (TextView) view.findViewById(R.id.sub_text);
+            TextView title = (TextView) convertView.findViewById(R.id.title_text);
+            TextView sub = (TextView) convertView.findViewById(R.id.sub_text);
 
             title.setText(song.getTitle());
             sub.setText(song.getArtist() + " — " + song.getAlbum());
 
-            return view;
+            if (mQueue.getCount() != 0 &&
+                mQueue.getCurrentPosition() == position) {
+                convertView.setBackgroundResource(R.drawable.list_item_bg);
+            }
+            else {
+                convertView.setBackgroundResource(0);
+            }
+
+            return convertView;
         }
     }
 }
