@@ -24,18 +24,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                   android:layout_width="fill_parent"
                   android:layout_height="fill_parent"
                   >
-        <Button
-            android:id="@+id/play_all"
-            android:text="@string/play_all"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/ListButton" />
-        <Button
-            android:id="@+id/enqueue_all"
-            android:text="@string/enqueue_all"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/ListButton" />
         <ListView
             android:id="@+id/playlist_list"
             android:layout_width="match_parent"

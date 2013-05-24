@@ -33,20 +33,8 @@ abstract public class SublibraryActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        initializeDrawer(false);
 
         getActionBar().setSubtitle("Fiction Music");
-
-        View layout = findViewById(R.id.bab_info);
-        layout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(SublibraryActivity.this,
-                                               NowPlayingActivity.class);
-                    SublibraryActivity.this.startActivity(intent);
-                }
-            });
-        Log.d("fiction", "sublibrary init");
     }
 
     @Override

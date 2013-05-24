@@ -29,13 +29,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
-
 import android.widget.TextView;
+
 import com.lithiumli.fiction.fragments.*;
 
 public class PlaylistsSublibraryActivity
@@ -57,6 +58,7 @@ public class PlaylistsSublibraryActivity
     };
 
     ListView mListView;
+    View mControls;
     FictionCursorAdapter mAdapter;
     Uri mUri;
 
@@ -65,6 +67,8 @@ public class PlaylistsSublibraryActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.playlists);
+        initializeDrawer(false);
+        initializeBottomActionBar();
 
         mUri = getIntent().getParcelableExtra(DATA_URI);
 
@@ -72,8 +76,30 @@ public class PlaylistsSublibraryActivity
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setTitle("Playlist");
 
+        LayoutInflater inflater = (LayoutInflater)
+            getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mListView = (ListView) findViewById(R.id.playlist_list);
         mListView.setOnItemClickListener(this);
+
+        mControls = inflater.inflate(R.layout.library_actions, null);
+        mListView.addHeaderView(mControls, null, false);
+
+        mControls
+            .findViewById(R.id.library_play_all)
+            .setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        // TODO XXX refactor this to deduplicate (see
+                        // onItemClick below)
+                        if (isServiceBound()) {
+                            PlaybackService service = getService();
+                            PlaybackQueue queue = service.getQueue();
+
+                            queue.setContext(PlaybackQueue.QueueContext.PLAYLIST,
+                                             mAdapter.getCursor());
+                            service.play(0);
+                        }
+                    }
+                });
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -102,6 +128,7 @@ public class PlaylistsSublibraryActivity
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long
                             id) {
+        position -= 1; // compensate for header view
         if (isServiceBound()) {
             PlaybackService service = getService();
             PlaybackQueue queue = service.getQueue();
