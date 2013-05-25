@@ -25,6 +25,8 @@ import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.ImageButton;
 
@@ -82,8 +84,24 @@ public class LibraryActivity
 
     @Override
     public void onSongChange(Song song) {
+        View bab = findViewById(R.id.bab);
+        View bab_hr = findViewById(R.id.bab_hr);
+        if (bab.getVisibility() == View.GONE) {
+            bab.setVisibility(View.VISIBLE);
+            Animation showBab = AnimationUtils.loadAnimation(this, R.anim.bab);
+            bab.startAnimation(showBab);
+            bab_hr.startAnimation(showBab);
+        }
+
         babSongTitle.setText(song.getTitle());
         babSubtitle.setText(song.getArtist() + " - " + song.getAlbum());
+    }
+
+    @Override
+    public void onServiceConnected(PlaybackService service) {
+        if (service.getQueue().getCount() == 0) {
+            findViewById(R.id.bab).setVisibility(View.GONE);
+        }
     }
 
     @Override
