@@ -71,15 +71,7 @@ public class LibraryActivity
         getActionBar().setSubtitle("Fiction Music");
         getActionBar().setTitle("Songs");
 
-        View layout = findViewById(R.id.bab_info);
-        layout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(LibraryActivity.this,
-                                               NowPlayingActivity.class);
-                    LibraryActivity.this.startActivity(intent);
-                }
-            });
+        initializeBottomActionBar();
     }
 
     @Override

@@ -19,6 +19,7 @@
 package com.lithiumli.fiction;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -72,7 +73,11 @@ public class NowPlayingActivity
         case android.R.id.home:
             Intent parentIntent = new Intent(this, LibraryActivity.class);
             parentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(parentIntent);
+            ActivityOptions options =
+                ActivityOptions.makeCustomAnimation(this,
+                                                    R.anim.activity_slide_down,
+                                                    R.anim.activity_slide_up);
+            startActivity(parentIntent, options.toBundle());
             finish();
             return true;
         }

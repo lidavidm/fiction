@@ -30,7 +30,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -142,20 +141,6 @@ public class PlaylistsSublibraryActivity
             }
             service.play(position);
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-        case android.R.id.home:
-            Intent parentIntent = new Intent(this, LibraryActivity.class);
-            parentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(parentIntent);
-            break;
-        default:
-            return super.onOptionsItemSelected(item);
-        }
-        return true;
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

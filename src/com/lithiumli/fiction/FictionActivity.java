@@ -19,6 +19,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. */
 package com.lithiumli.fiction;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -142,7 +143,11 @@ abstract public class FictionActivity extends Activity
                 public void onClick(View v) {
                     Intent intent = new Intent(FictionActivity.this,
                                                NowPlayingActivity.class);
-                    FictionActivity.this.startActivity(intent);
+                    ActivityOptions options =
+                        ActivityOptions.makeCustomAnimation(FictionActivity.this,
+                                                            R.anim.activity_slide_down,
+                                                            R.anim.activity_slide_up);
+                    FictionActivity.this.startActivity(intent, options.toBundle());
                 }
             });
     }

@@ -18,8 +18,10 @@
 
 package com.lithiumli.fiction;
 
+import android.app.ActivityOptions;
 import android.os.Bundle;
 import android.content.Intent;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.ImageButton;
@@ -57,5 +59,19 @@ abstract public class SublibraryActivity
         default:
             break;
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+            Intent parentIntent = new Intent(this, LibraryActivity.class);
+            parentIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(parentIntent);
+            break;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+        return true;
     }
 }
