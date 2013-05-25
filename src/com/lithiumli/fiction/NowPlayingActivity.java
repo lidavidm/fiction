@@ -85,6 +85,12 @@ public class NowPlayingActivity
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        overridePendingTransition(R.anim.activity_slide_down, R.anim.activity_slide_up);
+    }
+
+    @Override
     public void onServiceConnected(PlaybackService service) {
         mAdapter = new CoverAdapter(this, mCoverPager);
         mCoverPager.setAdapter(mAdapter);
