@@ -73,7 +73,7 @@ public class PlaybackService
 
     MediaPlayer mMediaPlayer;
     MediaPlayer mNextPlayer;
-    boolean mPaused = false;
+    boolean mPaused = true;
     RepeatMode mRepeat;
     PlaybackQueue mQueue;
     public final IBinder mBinder = new LocalBinder();
@@ -175,9 +175,8 @@ public class PlaybackService
         Intent intent = new Intent(EVENT_PLAYING);
         intent.putExtra(DATA_SONG, song);
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-        intent = new Intent(EVENT_PLAY_STATE);
-        intent.putExtra(DATA_STATE, PlayState.PLAYING.name());
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        broadcastPlayState(PlayState.PLAYING);
 
         Log.d("fiction", "Playing new song");
         try {
@@ -216,10 +215,7 @@ public class PlaybackService
             mPaused = true;
             Log.d("fiction", "Pausing");
 
-            Intent intent = new Intent(EVENT_PLAY_STATE);
-            intent.putExtra(DATA_STATE, PlayState.PAUSED.name());
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
-
+            broadcastPlayState(PlayState.PAUSED);
             showNotification();
         }
     }
@@ -229,9 +225,7 @@ public class PlaybackService
             mMediaPlayer.start();
             mPaused = false;
 
-            Intent intent = new Intent(EVENT_PLAY_STATE);
-            intent.putExtra(DATA_STATE, PlayState.PLAYING.name());
-            LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+            broadcastPlayState(PlayState.PLAYING);
 
             showNotification();
         }
@@ -241,7 +235,22 @@ public class PlaybackService
         return (mMediaPlayer != null) && (mMediaPlayer.isPlaying());
     }
 
+    public PlayState getPlayState() {
+        if (mPaused) {
+            return PlayState.PAUSED;
+        }
+        else {
+            return PlayState.PLAYING;
+        }
+    }
+
     // PRIVATE INTERFACE
+
+    private void broadcastPlayState(PlayState state) {
+        Intent intent = new Intent(EVENT_PLAY_STATE);
+        intent.putExtra(DATA_STATE, state.name());
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
 
     private void prepareNext() {
         int position = mQueue.getCurrentPosition();

@@ -62,6 +62,8 @@ abstract public class FictionActivity extends Activity
                     onSongChange(mService.getQueue().getCurrent());
                 }
 
+                onPlayStateChange(mService.getPlayState());
+
                 mAdapter = mService.getQueue().getAdapter(getApplicationContext());
                 mQueueListView.setAdapter(mAdapter);
                 mAdapter.notifyDataSetChanged();
