@@ -30,6 +30,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -80,25 +83,25 @@ public class PlaylistsSublibraryActivity
         mListView = (ListView) findViewById(R.id.playlist_list);
         mListView.setOnItemClickListener(this);
 
-        mControls = inflater.inflate(R.layout.library_actions, null);
-        mListView.addHeaderView(mControls, null, false);
+        // mControls = inflater.inflate(R.layout.library_actions, null);
+        // mListView.addHeaderView(mControls, null, false);
 
-        mControls
-            .findViewById(R.id.library_play_all)
-            .setOnClickListener(new View.OnClickListener() {
-                    public void onClick(View v) {
-                        // TODO XXX refactor this to deduplicate (see
-                        // onItemClick below)
-                        if (isServiceBound()) {
-                            PlaybackService service = getService();
-                            PlaybackQueue queue = service.getQueue();
+        // mControls
+        //     .findViewById(R.id.library_play_all)
+        //     .setOnClickListener(new View.OnClickListener() {
+        //             public void onClick(View v) {
+        //                 // TODO XXX refactor this to deduplicate (see
+        //                 // onItemClick below)
+        //                 if (isServiceBound()) {
+        //                     PlaybackService service = getService();
+        //                     PlaybackQueue queue = service.getQueue();
 
-                            queue.setContext(PlaybackQueue.QueueContext.PLAYLIST,
-                                             mAdapter.getCursor());
-                            service.play(0);
-                        }
-                    }
-                });
+        //                     queue.setContext(PlaybackQueue.QueueContext.PLAYLIST,
+        //                                      mAdapter.getCursor());
+        //                     service.play(0);
+        //                 }
+        //             }
+        //         });
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -122,6 +125,33 @@ public class PlaylistsSublibraryActivity
                 }
             };
             mListView.setAdapter(mAdapter);
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.playlist, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.play_all:
+            if (isServiceBound()) {
+                PlaybackService service = getService();
+                PlaybackQueue queue = service.getQueue();
+
+                queue.setContext(PlaybackQueue.QueueContext.PLAYLIST,
+                                 mAdapter.getCursor());
+                service.play(0);
+            }
+            return true;
+        case R.id.enqueue_all:
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
         }
     }
 

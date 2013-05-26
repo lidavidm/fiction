@@ -132,7 +132,10 @@ public class NowPlayingActivity
         mSongArtist.setText(song.getArtist());
 
         Log.d("fiction", song.getArtist());
-        if (song.getArtist() == "<unknown>") return;
+        if (song.getArtist().equals("<unknown>")) {
+            this.getWindow().setBackgroundDrawable(null);
+            return;
+        };
         String artist;
         try {
             artist = java.net.URLEncoder.encode(song.getArtist(), "UTF-8");
