@@ -24,9 +24,12 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ScaleDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -128,6 +131,7 @@ public class NowPlayingActivity
         mSongAlbum.setText(song.getAlbum());
         mSongArtist.setText(song.getArtist());
 
+        Log.d("fiction", song.getArtist());
         if (song.getArtist() == "<unknown>") return;
         String artist;
         try {
@@ -141,42 +145,7 @@ public class NowPlayingActivity
             Method.GET,
             ECHO_NEST_URL + artist,
             null,
-            new Response.Listener<JSONObject>() {
-                @Override
-                public void onResponse(JSONObject response) {
-                    try {
-                        response = response.getJSONObject("response");
-                        JSONArray images = response.getJSONArray("images");
-
-                        if (images.length() > 0) {
-                            JSONObject image = images.getJSONObject(0);
-                            String url = image.getString("url");
-                            mImageLoader.get(url, new
-                                             ImageLoader.ImageListener() {
-
-
-                                    @Override
-                                    public void onErrorResponse(VolleyError e) {
-                                        // image load error
-                                    }
-
-                                    @Override
-                                    public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-                                        if (response.getBitmap() != null) {
-                                            getWindow()
-                                                .setBackgroundDrawable(
-                                                    new BitmapDrawable(getResources(),
-                                                                       response.getBitmap()));
-                                        }
-                                    }
-                                });
-                        }
-                    }
-                    catch (JSONException e) {
-                        Log.d("fiction", "response error");
-                    }
-                }
-            },
+            new VolleyListener(),
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -185,8 +154,6 @@ public class NowPlayingActivity
             });
         mRequestQueue.add(req);
     }
-
-    // volley callbacks
 
     @Override
     public void onPlayStateChange(PlaybackService.PlayState state) {
@@ -250,7 +217,7 @@ public class NowPlayingActivity
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
+            container.removeView((ImageView) object);
         }
 
         @Override
@@ -260,6 +227,14 @@ public class NowPlayingActivity
 
         @Override
         public ImageView instantiateItem(ViewGroup container, int position) {
+            ImageView view = new ImageView(mActivity);
+            view = initializeView(view, position);
+            container.addView(view);
+            mCovers[position] = view;
+            return view;
+        }
+
+        private ImageView initializeView(ImageView view, int position) {
             int offset = -1;
 
             if (isAtBeginning()) {
@@ -275,15 +250,12 @@ public class NowPlayingActivity
                 }
             }
 
-            ImageView view = new ImageView(mActivity);
             Song song = getSong(position + offset);
             view.setImageURI(song.getAlbumArt());
             if (view.getDrawable() == null) {
                 view.setImageURI(Song.DEFAULT_ALBUM);
             }
 
-            container.addView(view);
-            mCovers[position] = view;
             return view;
         }
 
@@ -478,6 +450,44 @@ public class NowPlayingActivity
             } else { // (1,+Infinity]
                 // This page is way off-screen to the right.
                 view.setAlpha(0);
+            }
+        }
+    }
+
+    class VolleyListener implements Response.Listener<JSONObject> {
+        @Override
+            public void onResponse(JSONObject response) {
+            try {
+                response = response.getJSONObject("response");
+                JSONArray images = response.getJSONArray("images");
+
+                if (images.length() > 0) {
+                    JSONObject image = images.getJSONObject(0);
+                    String url = image.getString("url");
+                    mImageLoader.get(url, new VolleyImageListener());
+                }
+            }
+            catch (JSONException e) {
+                Log.d("fiction", "response error");
+            }
+        }
+    }
+
+    class VolleyImageListener implements ImageLoader.ImageListener {
+        @Override
+        public void onErrorResponse(VolleyError e) {
+            // image load error
+        }
+
+        @Override
+        public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
+            if (response.getBitmap() != null) {
+                BitmapDrawable d =
+                    new BitmapDrawable(getResources(),
+                                       response.getBitmap());
+                d.setColorFilter(0x99000000, PorterDuff.Mode.SRC_ATOP);
+                NowPlayingActivity.this.getWindow()
+                    .setBackgroundDrawable(d);
             }
         }
     }
