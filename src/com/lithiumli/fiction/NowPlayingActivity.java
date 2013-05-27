@@ -485,6 +485,8 @@ public class NowPlayingActivity
         @Override
         public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
             if (response.getBitmap() != null) {
+                Bitmap b = response.getBitmap();
+                b = Bitmap.createScaledBitmap();
                 BitmapDrawable d =
                     new BitmapDrawable(getResources(),
                                        response.getBitmap());
