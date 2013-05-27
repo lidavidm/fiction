@@ -32,6 +32,7 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 
@@ -102,6 +103,21 @@ abstract public class FictionActivity extends Activity
         mQueueListView = (ListView) findViewById(R.id.queue);
         mQueueListView.setFastScrollEnabled(true);
         mQueueListView.setFastScrollAlwaysVisible(true);
+        mQueueListView.setOnItemClickListener(
+            new AdapterView.OnItemClickListener()
+            {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View v,
+                                        int position, long id) {
+                    if (isServiceBound()) {
+                        getService().play(position);
+
+                        if (mAdapter != null) {
+                            mAdapter.notifyDataSetChanged();
+                        }
+                    }
+                }
+            });
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer);
         mDrawerToggle = new ActionBarDrawerToggle(this, mDrawer,
@@ -224,6 +240,10 @@ abstract public class FictionActivity extends Activity
 
     public boolean isServiceBound() {
         return mBound;
+    }
+
+    public boolean isDrawerOpen() {
+        return mDrawer.isDrawerOpen(GravityCompat.START);
     }
 
     // EVENTS

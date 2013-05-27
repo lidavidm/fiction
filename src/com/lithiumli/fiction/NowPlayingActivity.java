@@ -24,9 +24,10 @@ import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ScaleDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -131,9 +132,8 @@ public class NowPlayingActivity
         mSongAlbum.setText(song.getAlbum());
         mSongArtist.setText(song.getArtist());
 
-        Log.d("fiction", song.getArtist());
         if (song.getArtist().equals("<unknown>")) {
-            this.getWindow().setBackgroundDrawable(null);
+            ((ImageView) findViewById(R.id.background_image)).setImageDrawable(new ColorDrawable(0xFF000000));
             return;
         };
         String artist;
@@ -485,14 +485,12 @@ public class NowPlayingActivity
         @Override
         public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
             if (response.getBitmap() != null) {
-                Bitmap b = response.getBitmap();
-                b = Bitmap.createScaledBitmap();
-                BitmapDrawable d =
-                    new BitmapDrawable(getResources(),
-                                       response.getBitmap());
-                d.setColorFilter(0x99000000, PorterDuff.Mode.SRC_ATOP);
-                NowPlayingActivity.this.getWindow()
-                    .setBackgroundDrawable(d);
+                ((ImageView) NowPlayingActivity.this.findViewById(R.id.background_image)).setImageBitmap(response.getBitmap());
+            }
+            else {
+                ((ImageView)
+        NowPlayingActivity.this.findViewById(R.id.background_image)).setImageDrawable(new
+                                                                                      ColorDrawable(0xFF000000));
             }
         }
     }
