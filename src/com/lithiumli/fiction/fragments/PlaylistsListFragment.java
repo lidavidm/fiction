@@ -18,9 +18,11 @@
 
 package com.lithiumli.fiction.fragments;
 
+import android.app.AlertDialog;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -32,6 +34,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.lithiumli.fiction.LibraryActivity;
@@ -61,9 +64,31 @@ public class PlaylistsListFragment
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public void onPrepareOptionsMenu(Menu menu) {
+        boolean drawerOpen = ((LibraryActivity) getActivity()).isDrawerOpen();
+        menu.findItem(R.id.new_playlist).setVisible(!drawerOpen);
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
         case R.id.new_playlist:
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.new_playlist);
+            EditText text = new EditText(getActivity());
+            builder.setView(text);
+            builder.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                    }
+                });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+            AlertDialog dialog = builder.create();
+            dialog.show();
             return true;
         default:
             break;
