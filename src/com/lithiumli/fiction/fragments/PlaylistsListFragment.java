@@ -48,7 +48,35 @@ public class PlaylistsListFragment
         if (getListAdapter() == null) {
             mAdapter = new PlaylistsCursorAdapter(getActivity(), null, 0);
             setListAdapter(mAdapter);
+            mAdapter.setFilterQueryProvider(this);
         }
+    }
+
+    @Override
+    public Cursor runQuery(CharSequence constraint) {
+        String query;
+        String filter;
+        String[] params;
+        if (constraint == null) {
+            query = "";
+        }
+        else {
+            query = constraint.toString();
+        }
+        if (query.equals("")) {
+            filter = "";
+            params = null;
+        }
+        else {
+            filter = MediaStore.Audio.Playlists.NAME + " LIKE '%' || ? || '%'";
+            params = new String[] { query };
+        }
+        return getActivity().getContentResolver().query(
+            MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+            PROJECTION,
+            filter,
+            params,
+            MediaStore.Audio.Playlists.NAME);
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long

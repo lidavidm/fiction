@@ -33,6 +33,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AlphabetIndexer;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 import android.widget.CursorAdapter;
 import android.widget.SectionIndexer;
@@ -47,7 +48,8 @@ import com.lithiumli.fiction.PlaybackService;
 abstract public class FictionListFragment
     extends ListFragment
     implements LoaderManager.LoaderCallbacks<Cursor>,
-               AdapterView.OnItemClickListener {
+               AdapterView.OnItemClickListener,
+               FilterQueryProvider {
     protected CursorAdapter mAdapter;
 
     static final String[] PROJECTION = {
@@ -65,8 +67,13 @@ abstract public class FictionListFragment
         setEmptyText("No songs");
 
         getListView().setOnItemClickListener(this);
+        getListView().setTextFilterEnabled(true);
 
         getLoaderManager().initLoader(0, null, this);
+    }
+
+    public void filter(String query) {
+        mAdapter.getFilter().filter(query);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

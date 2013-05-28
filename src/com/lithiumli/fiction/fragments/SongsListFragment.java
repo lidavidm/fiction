@@ -29,7 +29,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
-
 import com.lithiumli.fiction.FictionActivity;
 import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.PlaybackQueue;
@@ -54,6 +53,7 @@ public class SongsListFragment
         if (getListAdapter() == null) {
             mAdapter = new SongsCursorAdapter(getActivity(), null, 0);
             setListAdapter(mAdapter);
+            mAdapter.setFilterQueryProvider(this);
         }
     }
 
@@ -80,6 +80,34 @@ public class SongsListFragment
                                 PROJECTION,
                                 select, null,
                                 MediaStore.Audio.Media.TITLE_KEY);
+    }
+
+    // TODO factor this out into a separate class like 'QueryUtils' or something
+    @Override
+    public Cursor runQuery(CharSequence constraint) {
+        String query;
+        String filter;
+        String[] params;
+        if (constraint == null) {
+            query = "";
+        }
+        else {
+            query = constraint.toString();
+        }
+        if (query.equals("")) {
+            filter = "";
+            params = null;
+        }
+        else {
+            filter = MediaStore.Audio.Media.TITLE + " LIKE '%' || ? || '%'";
+            params = new String[] { query };
+        }
+        return getActivity().getContentResolver().query(
+            MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+            PROJECTION,
+            filter,
+            params,
+            MediaStore.Audio.Media.TITLE_KEY);
     }
 
     class SongsCursorAdapter extends FictionCursorAdapter

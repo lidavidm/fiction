@@ -24,11 +24,15 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.ImageButton;
+import android.util.Log;
 
 import android.support.v4.view.ViewPager;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -72,6 +76,36 @@ public class LibraryActivity
         getActionBar().setTitle("Songs");
 
         initializeBottomActionBar();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.library, menu);
+        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+        searchView.setOnQueryTextListener(
+            new SearchView.OnQueryTextListener() {
+                @Override
+                public boolean onQueryTextChange(String query) {
+                    FictionListFragment f = mTabsAdapter.getFragment(mViewPager.getCurrentItem());
+                    f.filter(query);
+                    return true;
+                }
+
+                @Override
+                public boolean onQueryTextSubmit(String query) {
+                    return false;
+                }
+            });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean drawerOpen = isDrawerOpen();
+        menu.findItem(R.id.search).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -139,6 +173,7 @@ public class LibraryActivity
             public final Bundle args;
             public final String title;
             public final int bgResource;
+            public FictionListFragment fragment;
 
             public TabInfo(Class<?> _class, Bundle _args, String _title,
                            int _bgResource) {
@@ -170,7 +205,8 @@ public class LibraryActivity
         @Override
         public Fragment getItem(int position) {
             TabInfo info = mTabs.get(position);
-            return Fragment.instantiate(mContext, info.clss.getName(), info.args);
+            info.fragment = (FictionListFragment) Fragment.instantiate(mContext, info.clss.getName(), info.args);
+            return info.fragment;
         }
 
         public TabInfo getItemInfo(int position) {
@@ -180,6 +216,10 @@ public class LibraryActivity
         @Override
         public CharSequence getPageTitle(int position) {
             return mTabs.get(position).title;
+        }
+
+        public FictionListFragment getFragment(int position) {
+            return mTabs.get(position).fragment;
         }
     }
 }
