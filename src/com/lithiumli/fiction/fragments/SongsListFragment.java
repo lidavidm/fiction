@@ -29,7 +29,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
-import com.lithiumli.fiction.FictionActivity;
+
+import com.lithiumli.fiction.LibraryActivity;
 import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.PlaybackQueue;
 import com.lithiumli.fiction.PlaybackService;
@@ -59,18 +60,8 @@ public class SongsListFragment
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long
                             id) {
-        FictionActivity activity = (FictionActivity) getActivity();
-
-        if (activity.isServiceBound()) {
-            PlaybackService service = activity.getService();
-            PlaybackQueue queue = service.getQueue();
-
-            if (queue.getContext() != PlaybackQueue.QueueContext.SONG) {
-                queue.setContext(PlaybackQueue.QueueContext.SONG,
-                                 mAdapter.getCursor());
-            }
-            service.play(position);
-        }
+        LibraryActivity activity = (LibraryActivity) getActivity();
+        activity.onSongSelected(position, mAdapter.getCursor());
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

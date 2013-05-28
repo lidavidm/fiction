@@ -70,6 +70,8 @@ abstract public class FictionListFragment
         getListView().setTextFilterEnabled(true);
 
         getLoaderManager().initLoader(0, null, this);
+
+        setHasOptionsMenu(true);
     }
 
     public void filter(String query) {

@@ -24,6 +24,8 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -144,6 +146,25 @@ public class LibraryActivity
         default:
             break;
         }
+    }
+
+    public void onSongSelected(int position, Cursor cursor) {
+        if (this.isServiceBound()) {
+            PlaybackService service = this.getService();
+            PlaybackQueue queue = service.getQueue();
+
+            if (queue.getContext() != PlaybackQueue.QueueContext.SONG) {
+                queue.setContext(PlaybackQueue.QueueContext.SONG,
+                                 cursor);
+            }
+            service.play(position);
+        }
+    }
+
+    public void onPlaylistSelected(Uri uri) {
+        Intent intent = new Intent(this, PlaylistsSublibraryActivity.class);
+        intent.putExtra(PlaylistsSublibraryActivity.DATA_URI, uri);
+        startActivity(intent);
     }
 
     @Override

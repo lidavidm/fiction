@@ -27,11 +27,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.TextView;
 
-import com.lithiumli.fiction.PlaylistsSublibraryActivity;
+import com.lithiumli.fiction.LibraryActivity;
 import com.lithiumli.fiction.R;
 
 public class PlaylistsListFragment
@@ -50,6 +53,22 @@ public class PlaylistsListFragment
             setListAdapter(mAdapter);
             mAdapter.setFilterQueryProvider(this);
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.library_playlists, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.new_playlist:
+            return true;
+        default:
+            break;
+        }
+        return super.onContextItemSelected(item);
     }
 
     @Override
@@ -82,9 +101,7 @@ public class PlaylistsListFragment
     public void onItemClick(AdapterView<?> parent, View view, int position, long
                             id) {
         Uri contentUri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
-        Intent intent = new Intent(getActivity(), PlaylistsSublibraryActivity.class);
-        intent.putExtra(PlaylistsSublibraryActivity.DATA_URI, contentUri);
-        startActivity(intent);
+        ((LibraryActivity) getActivity()).onPlaylistSelected(contentUri);
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
