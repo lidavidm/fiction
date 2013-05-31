@@ -18,6 +18,7 @@
 
 package com.lithiumli.fiction.fragments;
 
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
@@ -26,18 +27,23 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageButton;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lithiumli.fiction.LibraryActivity;
 import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.PlaybackQueue;
 import com.lithiumli.fiction.PlaybackService;
+import com.lithiumli.fiction.Song;
 import com.lithiumli.fiction.ui.SongsAlphabetIndexer;
 
 public class SongsListFragment
-    extends FictionListFragment {
+    extends FictionListFragment
+    implements View.OnClickListener, View.OnLongClickListener {
     static final String[] PROJECTION = {
         MediaStore.Audio.Media._ID,
         MediaStore.Audio.Media.TITLE,
@@ -101,6 +107,36 @@ public class SongsListFragment
             MediaStore.Audio.Media.TITLE_KEY);
     }
 
+    @Override
+    public void onClick(final View v) {
+        getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    int position = getListView().getPositionForView(v);
+
+                    Cursor data = mAdapter.getCursor();
+                    data.moveToPosition(position);
+                    long id = data.getLong(0);
+                    Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                                                                id);
+                    Song song = new Song(contentUri);
+                    song.populate(data);
+
+                    ((LibraryActivity) getActivity()).onSongEnqueued(song);
+                }
+            });
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        Toast toast = Toast.makeText(
+            getActivity(),
+            v.getContentDescription(),
+            Toast.LENGTH_SHORT);
+        toast.show();
+        return true;
+    }
+
     class SongsCursorAdapter extends FictionCursorAdapter
         // implements SectionIndexer
     {
@@ -125,6 +161,10 @@ public class SongsListFragment
             title.setText(songTitle);
 
             sub.setText(songArtist + " — " + songAlbum);
+
+            // TODO refactor this out
+            ((ImageButton) view.findViewById(R.id.list_enqueue)).setOnClickListener(SongsListFragment.this);
+            view.findViewById(R.id.list_enqueue).setOnLongClickListener(SongsListFragment.this);
         }
 
         @Override

@@ -89,8 +89,9 @@ public class LibraryActivity
             new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextChange(String query) {
-                    FictionListFragment f = mTabsAdapter.getFragment(mViewPager.getCurrentItem());
-                    f.filter(query);
+                    // TODO XXX causes NPE on orientation change
+                    // FictionListFragment f = mTabsAdapter.getFragment(mViewPager.getCurrentItem());
+                    // f.filter(query);
                     return true;
                 }
 
@@ -165,6 +166,29 @@ public class LibraryActivity
         Intent intent = new Intent(this, PlaylistsSublibraryActivity.class);
         intent.putExtra(PlaylistsSublibraryActivity.DATA_URI, uri);
         startActivity(intent);
+    }
+
+    public void onSongEnqueued(Song song) {
+        if (this.isServiceBound()) {
+            PlaybackService service = this.getService();
+            PlaybackQueue queue = service.getQueue();
+
+            if (queue.getContext() != PlaybackQueue.QueueContext.QUEUE) {
+                Song currentSong = null;
+                if (queue.getCount() > 0) {
+                    currentSong = queue.getCurrent();
+                }
+
+                queue.setContext(PlaybackQueue.QueueContext.QUEUE, null);
+
+                if (currentSong != null) {
+                    queue.enqueue(currentSong);
+                    queue.setCurrent(0);
+                }
+            }
+
+            queue.enqueue(song);
+        }
     }
 
     @Override

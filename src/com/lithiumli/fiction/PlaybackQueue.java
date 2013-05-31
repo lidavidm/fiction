@@ -98,6 +98,8 @@ public class PlaybackQueue {
                 }
             }
             break;
+        case QUEUE:
+            mSongs.clear();
         default:
             break;
         }
@@ -131,6 +133,10 @@ public class PlaybackQueue {
         assert position < mSongs.size() && position >= 0 : "Invalid queue position";
 
         mCurrent = position;
+    }
+
+    public void enqueue(Song song) {
+        mSongs.add(song);
     }
 
     public void shuffle() {

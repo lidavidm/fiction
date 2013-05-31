@@ -23,7 +23,7 @@ abstract public class FictionCursorAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup
                         parent) {
-        final View view = mInflater.inflate(R.layout.list_item,
+        final View view = mInflater.inflate(R.layout.list_item_library,
                                             parent, false);
         return view;
     }
