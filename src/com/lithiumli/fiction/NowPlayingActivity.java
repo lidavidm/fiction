@@ -65,7 +65,6 @@ public class NowPlayingActivity
     TextView mSongAlbum;
     TextView mSongArtist;
     AlbumSwiper mCoverPager;
-    CoverAdapter mAdapter;
     RequestQueue mRequestQueue;
     ImageLoader mImageLoader;
 

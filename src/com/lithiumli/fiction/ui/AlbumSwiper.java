@@ -12,17 +12,22 @@ import android.util.Log;
 import android.view.View;
 
 import com.lithiumli.fiction.PlaybackQueue;
+import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.Song;
 
 public class AlbumSwiper extends View {
     Context mContext;
     PlaybackQueue mQueue;
     Drawable mPrev, mCurrent, mNext;
+    Drawable mNoCover;
     int mOldPosition = -1;
 
     public AlbumSwiper(Context context, AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        // TODO make this an XML attr
+        mNoCover =
+            mContext.getResources().getDrawable(R.drawable.filler_album);
     }
 
     public void setQueue(PlaybackQueue queue) {
@@ -45,29 +50,41 @@ public class AlbumSwiper extends View {
             if (position != mOldPosition) {
                 mOldPosition = position;
 
+                int offset = getWidth() / 3;
+
                 if (position > 0) {
                     prev = mQueue.getItem(position - 1);
-                    mPrev = resolve(prev.getAlbumArt());
+                    mPrev = resolve(prev.getAlbumArt(), -offset, 0, 0.75f);
+                    mPrev.setAlpha(192);
+                }
+                else {
+                    mPrev = null;
                 }
 
                 current = mQueue.getCurrent();
-                mCurrent = resolve(current.getAlbumArt());
+                mCurrent = resolve(current.getAlbumArt(), 0, 0, 1f);
+                mCurrent.setAlpha(224);
 
                 if (position < count - 1) {
                     next = mQueue.getItem(position + 1);
-                    mNext = resolve(next.getAlbumArt());
+                    mNext = resolve(next.getAlbumArt(), offset, 0, 0.75f);
+                    mNext.setAlpha(192);
                 }
             }
 
+            if (mPrev != null) {
+                mPrev.draw(canvas);
+            }
+            if (mNext != null) {
+                mNext.draw(canvas);
+            }
             if (mCurrent != null) {
                 mCurrent.draw(canvas);
-            }
-            else {
             }
         }
     }
 
-    private Drawable resolve(Uri uri) {
+    private Drawable resolve(Uri uri, int offsetX, int offsetY, float scale) {
         Drawable d = null;
 
         if (uri != null) {
@@ -89,17 +106,18 @@ public class AlbumSwiper extends View {
         }
 
         if (d == null) {
-            Log.d("fiction", "no cover");
-            return null;
+            return mNoCover;
         }
         else {
             BitmapDrawable b = (BitmapDrawable) d;
-            int w = getWidth();
+            int w = (int) (0.9 * getWidth());
             int h = getHeight();
             int bw = b.getIntrinsicWidth();
             int bh = b.getIntrinsicHeight();
 
             int fw, fh;
+
+            offsetX += (int) (0.05 * getWidth());
 
             if (bw > bh) {
                 fw = w;
@@ -110,11 +128,10 @@ public class AlbumSwiper extends View {
                 fw = (int) (((float) bw / (float) bh) * fh);
             }
 
-            Log.d("fiction", Integer.toString(fw) + "," + Integer.toString(fh));
-            Log.d("fiction", Integer.toString(w) + ",," + Integer.toString(h));
-            Log.d("fiction", Integer.toString(bw) + ",,," + Integer.toString(bh));
+            fh = (int) (scale * fh);
+            fw = (int) (scale * fw);
 
-            b.setBounds(0, (h - fh) / 2, fw, (h + fh) / 2);
+            b.setBounds(offsetX, (h - fh) / 2, fw + offsetX, (h + fh) / 2);
 
             return b;
         }
