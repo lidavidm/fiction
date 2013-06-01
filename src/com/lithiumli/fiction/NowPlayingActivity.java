@@ -69,27 +69,26 @@ public class NowPlayingActivity
     ImageLoader mImageLoader;
 
     @Override
-    public void onCreate(Bundle savedInstanceState)
-        {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.now_playing);
-            initializeDrawer(false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.now_playing);
+        initializeDrawer(false);
 
-            mCoverPager = (AlbumSwiper) findViewById(R.id.cover_pager);
+        mCoverPager = (AlbumSwiper) findViewById(R.id.cover_pager);
 
-            mSongName = (TextView) findViewById(R.id.np_song_name);
-            mSongAlbum = (TextView) findViewById(R.id.np_song_album);
-            mSongArtist = (TextView) findViewById(R.id.np_song_artist);
-            mSongArtist.setSelected(true);
+        mSongName = (TextView) findViewById(R.id.np_song_name);
+        mSongAlbum = (TextView) findViewById(R.id.np_song_album);
+        mSongArtist = (TextView) findViewById(R.id.np_song_artist);
+        mSongArtist.setSelected(true);
 
-            ActionBar ab = getActionBar();
-            ab.setDisplayHomeAsUpEnabled(true);
-            ab.setTitle("Now Playing");
-            ab.setSubtitle("Fiction Music");
+        ActionBar ab = getActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setTitle("Now Playing");
+        ab.setSubtitle("Fiction Music");
 
-            mRequestQueue = Volley.newRequestQueue(this);
-            mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
-        }
+        mRequestQueue = Volley.newRequestQueue(this);
+        mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -117,6 +116,7 @@ public class NowPlayingActivity
     @Override
     public void onServiceConnected(PlaybackService service) {
         mCoverPager.setQueue(service.getQueue());
+        mCoverPager.updateCovers();
     }
 
     @Override
@@ -124,6 +124,8 @@ public class NowPlayingActivity
         mSongName.setText(song.getTitle());
         mSongAlbum.setText(song.getAlbum());
         mSongArtist.setText(song.getArtist());
+
+        mCoverPager.updateCovers();
 
         if (song.getArtist().equals("<unknown>")) {
             ((ImageView) findViewById(R.id.background_image)).setImageDrawable(new ColorDrawable(0xFF000000));
