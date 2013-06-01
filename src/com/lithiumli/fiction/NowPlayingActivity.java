@@ -75,6 +75,7 @@ public class NowPlayingActivity
         initializeDrawer(false);
 
         mCoverPager = (AlbumSwiper) findViewById(R.id.cover_pager);
+        mCoverPager.setListener(this);
 
         mSongName = (TextView) findViewById(R.id.np_song_name);
         mSongAlbum = (TextView) findViewById(R.id.np_song_album);

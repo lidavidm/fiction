@@ -1,5 +1,8 @@
 package com.lithiumli.fiction.ui;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Canvas;
@@ -15,6 +18,7 @@ import android.view.VelocityTracker;
 import android.view.View;
 import android.widget.Scroller;
 
+import com.lithiumli.fiction.FictionActivity;
 import com.lithiumli.fiction.PlaybackQueue;
 import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.Song;
@@ -25,6 +29,8 @@ public class AlbumSwiper extends View {
     Cover[] mCovers = new Cover[5];
     Cover mNoCover;
     GestureDetector mDetector;
+    double mTheta;
+    FictionActivity mListener;
 
     float mStartX, mStartY;
 
@@ -34,7 +40,7 @@ public class AlbumSwiper extends View {
         // TODO make this an XML attr
         mNoCover = new Cover(
             (BitmapDrawable) mContext.getResources().getDrawable(R.drawable.filler_album),
-            400, 400, 0, 1.0f);
+            400, 400, 1.0);
         mDetector = new GestureDetector(context, new Listener());
     }
 
@@ -42,6 +48,9 @@ public class AlbumSwiper extends View {
         mQueue = queue;
     }
 
+    public void setListener(FictionActivity activity) {
+        mListener = activity;
+    }
     public int getRadius() {
         return (int) (getWidth() / 3f);
     }
@@ -50,15 +59,12 @@ public class AlbumSwiper extends View {
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        _draw(canvas, 1);
-        _draw(canvas, 3);
-        _draw(canvas, 2);
-    }
-
-    private void _draw(Canvas canvas, int index) {
-        Cover c = mCovers[index];
-        if (c != null) {
-            c.draw(canvas);
+        Cover[] covers = java.util.Arrays.copyOf(mCovers, 5);
+        java.util.Arrays.sort(covers);
+        for (Cover c : covers) {
+            if (c != null) {
+                c.draw(canvas);
+            }
         }
     }
 
@@ -70,30 +76,43 @@ public class AlbumSwiper extends View {
 
 	@Override
 	public boolean onTouchEvent(MotionEvent ev) {
-        mDetector.onTouchEvent(ev);
-		// float x = ev.getX();
-		// float y = ev.getY();
-
 		switch (ev.getAction()) {
-		// case MotionEvent.ACTION_DOWN:
-        //     mStartX = x;
-        //     mStartY = y;
-        //     break;
-        // case MotionEvent.ACTION_MOVE:
-        //     int dx = (int) (x - mStartX);
-        //     float scale = 1.0f - 0.75f * Math.abs(dx) / getWidth();  // 1/3 = 75%
-        //     if (scale < 0.25f) scale = 0.33f;
+        case MotionEvent.ACTION_DOWN:
 
-        //     if (mCurrent != null) {
-        //         mCurrent.setOffsetX(dx);
-        //         mCurrent.setScale(scale);
-        //     }
-        //     invalidate();
-        //     break;
+            break;
+        case MotionEvent.ACTION_SCROLL:
+            if (mQueue != null) {
+                if (mQueue.getCurrentPosition() == 0) {
+                }
+                else if (mQueue.getCurrentPosition() == mQueue.getCount() - 1) {
+                }
+            }
+            break;
         case MotionEvent.ACTION_UP:
         case MotionEvent.ACTION_CANCEL:
-            scroll(0.0);
-            invalidate();
+            if (mTheta >= Math.PI / 5) {
+                scrollTo(Math.PI / 5, new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mListener != null) {
+                                mListener.prevButton(AlbumSwiper.this);
+                            }
+                        }
+                    });
+            }
+            else if (mTheta <= -Math.PI / 5) {
+                scrollTo(-Math.PI / 5, new Runnable() {
+                        @Override
+                        public void run() {
+                            if (mListener != null) {
+                                mListener.nextButton(AlbumSwiper.this);
+                            }
+                        }
+                    });
+            }
+            else {
+                scrollTo(0.0, null);
+            }
             break;
         default:
             break;
@@ -102,15 +121,44 @@ public class AlbumSwiper extends View {
     }
 
     private void scroll(double theta) {
+        mTheta = theta;
         int r = getRadius();
         double t = theta - (2 * Math.PI / 4);
         for (Cover c : mCovers) {
             if (c != null) {
                 c.setAngle(t);
-                c.setAlpha((int) (255 * Math.cos(theta)));
+                int alpha = (int) (320 * Math.cos(theta));
+                if (alpha > 255) alpha = 255;
+                else if (alpha < 192) alpha = 192;
+                c.setAlpha(alpha);
             }
             t += Math.PI / 4;
         }
+    }
+
+    private void scrollTo(double theta, final Runnable callback) {
+        ValueAnimator a = ValueAnimator.ofFloat((float) mTheta, (float) theta);
+        a.setDuration(200);
+        a.addUpdateListener(
+            new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator a) {
+                    Float angle = (Float) a.getAnimatedValue();
+                    scroll(angle.doubleValue());
+                    invalidate();
+                }
+            });
+
+        if (callback != null) {
+            a.addListener(new AnimatorListenerAdapter() {
+                    @Override
+                    public void onAnimationEnd(Animator a) {
+                        callback.run();
+                    }
+                });
+        }
+
+        a.start();
     }
 
     public void updateCovers() {
@@ -174,19 +222,26 @@ public class AlbumSwiper extends View {
             int bh = b.getIntrinsicHeight();
 
             int fw, fh;
-            Log.d("fiction", Integer.toString(w) + "," + Integer.toString(h));
             if (bw > bh) {
                 fw = w;
                 fh = (int) (((float) bh / (float) bw) * fw);
+
+                if (fh > h) {
+                    fw = (int) (((float) h / fh) * fw);
+                    fh = h;
+                }
             }
             else {
                 fh = h;
                 fw = (int) (((float) bw / (float) bh) * fh);
+
+                if (fw > w) {
+                    fh = (int) (((float) w / fw) * fh);
+                    fw = w;
+                }
             }
 
-            int offsetX = (int) (0.05 * getWidth());
-
-            return new Cover(b, fw, fh, offsetX, angle);
+            return new Cover(b, fw, fh, angle);
         }
     }
 
@@ -194,26 +249,24 @@ public class AlbumSwiper extends View {
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2,
                                 float distanceX, float distanceY) {
-            int dx = (int) (e2.getX() - e1.getX());
-            double theta = Math.atan((double) dx / AlbumSwiper.this.getRadius());
-
+            double theta = (e2.getX() - e1.getX()) / AlbumSwiper.this.getRadius();
             AlbumSwiper.this.scroll(theta);
             AlbumSwiper.this.invalidate();
             return true;
         }
     }
 
-    class Cover {
-        int width, height, offset;
+    class Cover implements Comparable {
+        int width, height;
         BitmapDrawable b;
         double theta;
 
-        public Cover(BitmapDrawable _b, int _width, int _height,
-                     int _offset, double _theta) {
+        final float MIN_SCALE = (float) Math.cos(Math.PI / 4);
+
+        public Cover(BitmapDrawable _b, int _width, int _height, double _theta) {
             b = _b;
             width = _width;
             height = _height;
-            offset = _offset;
             theta = _theta;
 
             setBounds();
@@ -222,22 +275,25 @@ public class AlbumSwiper extends View {
         public void setBounds() {
             int r = AlbumSwiper.this.getRadius();
             int viewHeight = AlbumSwiper.this.getHeight();
+            int viewWidth = AlbumSwiper.this.getWidth();
             float scale = (float) Math.cos(theta);
+
+            if (scale < MIN_SCALE) scale = MIN_SCALE;
 
             int fw = (int) (scale * width);
             int fh = (int) (scale * height);
-            int offsetX = offset + (int) (r * Math.sin(theta));
+            int offsetX = (int) ((viewWidth / 2f) - (fw / 2f) +  (r * Math.sin(theta)));
             int offsetY = (viewHeight - fh) / 2;
-
-            Log.d("fiction", Double.toString(theta / Math.PI) + "," +
-                             Float.toString(scale) + "," +
-                             Integer.toString(offsetX));
 
             b.setBounds(offsetX, offsetY, fw + offsetX, fh + offsetY);
         }
 
         public void setAlpha(int alpha) {
             b.setAlpha(alpha);
+        }
+
+        public double getAngle() {
+            return theta;
         }
 
         public void setAngle(double _theta) {
@@ -251,6 +307,24 @@ public class AlbumSwiper extends View {
         public void draw(Canvas c) {
             setBounds();
             b.draw(c);
+        }
+
+        public int compareTo(Object o) {
+            if (o == null) {
+                return -1;
+            }
+            Cover c = (Cover) o;
+            double a1 = Math.abs(getAngle());
+            double a2 = Math.abs(c.getAngle());
+
+            // angle of 0 is "largest"
+            if (a1 > a2) {
+                return -1;
+            }
+            else if (a2 > a1) {
+                return 1;
+            }
+            return 0;
         }
     }
 }
