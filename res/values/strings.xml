@@ -27,4 +27,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     <string name="new_playlist">Create New Playlist</string>
     <string name="create">Create</string>
     <string name="cancel">Cancel</string>
+    <string name="save_queue">Save Queue</string>
+    <string name="clear_queue">Clear Queue</string>
 </resources>

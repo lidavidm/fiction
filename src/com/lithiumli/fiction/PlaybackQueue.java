@@ -165,6 +165,14 @@ public class PlaybackQueue {
         }
     }
 
+    public void clear() {
+        mSongs = new ArrayList<Song>(10);
+        mSongsOriginal = new ArrayList<Song>(10);
+        mQueueContext = null;
+        mCurrent = 0;
+        mCursor = null;
+    }
+
     public boolean isShuffling() {
         return mShuffle;
     }

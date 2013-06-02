@@ -161,6 +161,7 @@ public class PlaybackService
     public void onDestroy() {
         Log.d("fiction", "destroying service");
         if (mMediaPlayer != null) mMediaPlayer.release();
+        if (mNextPlayer != null) mNextPlayer.release();
         super.onDestroy();
     }
 
@@ -193,10 +194,23 @@ public class PlaybackService
         }
     }
 
+    public void stop() {
+        hideNotification();
+        broadcastPlayState(PlayState.STOPPED);
+        if (mMediaPlayer != null) {
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+        }
+        if (mNextPlayer != null) {
+            mNextPlayer.release();
+            mNextPlayer = null;
+        }
+    }
+
     public void next() {
         int position = mQueue.getCurrentPosition();
 
-        if (position <= mQueue.getCount()) {
+        if (position < mQueue.getCount() - 1) {
             play(position + 1);
             Log.d("fiction", "Next song");
         }

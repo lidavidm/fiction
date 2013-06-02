@@ -30,6 +30,8 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -219,13 +221,38 @@ abstract public class FictionActivity extends Activity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.queue, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean drawerOpen = isDrawerOpen();
+        menu.findItem(R.id.save_queue).setVisible(drawerOpen);
+        menu.findItem(R.id.clear_queue).setVisible(drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Pass the event to ActionBarDrawerToggle, if it returns
-        // true, then it has handled the app icon touch event
         if (mDrawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
-        // Handle your other action bar items...
+
+        switch (item.getItemId()) {
+        case R.id.save_queue:
+            return true;
+        case R.id.clear_queue:
+            if (isServiceBound()) {
+                PlaybackService service = getService();
+                service.stop();
+                service.getQueue().clear();
+                mDrawer.closeDrawers();
+            }
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }

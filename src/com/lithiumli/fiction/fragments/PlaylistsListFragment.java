@@ -61,6 +61,7 @@ public class PlaylistsListFragment
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.library_playlists, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

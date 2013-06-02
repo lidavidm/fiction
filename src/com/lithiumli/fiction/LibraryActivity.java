@@ -141,6 +141,15 @@ public class LibraryActivity
         case PLAYING:
             button.setImageResource(R.drawable.ic_menu_pause);
             break;
+        case STOPPED:
+            View bab = findViewById(R.id.bab);
+            View bab_hr = findViewById(R.id.bab_hr);
+            if (bab.getVisibility() == View.VISIBLE) {
+                Animation hideBab = AnimationUtils.loadAnimation(this, R.anim.bab_hide);
+                bab.startAnimation(hideBab);
+                bab_hr.startAnimation(hideBab);
+                bab.setVisibility(View.GONE);
+            }
         case PAUSED:
             button.setImageResource(R.drawable.ic_menu_play);
             break;

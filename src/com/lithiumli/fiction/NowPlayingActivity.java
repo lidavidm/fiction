@@ -162,6 +162,7 @@ public class NowPlayingActivity
         case PLAYING:
             button.setImageResource(R.drawable.ic_menu_pause);
             break;
+        case STOPPED:
         case PAUSED:
             button.setImageResource(R.drawable.ic_menu_play);
             break;
@@ -185,6 +186,8 @@ public class NowPlayingActivity
                 button.setColorFilter(0xFF0099CC);
                 queue.shuffle();
             }
+
+            mCoverPager.updateCovers();
         }
     }
 

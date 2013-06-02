@@ -112,7 +112,7 @@ public class PlaylistsSublibraryActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.playlist, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
