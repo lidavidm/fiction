@@ -158,7 +158,18 @@ public class LibraryActivity
                 queue.setContext(PlaybackQueue.QueueContext.SONG,
                                  cursor);
             }
+
+            boolean wasShuffling = false;
+            if (queue.isShuffling()) {
+                queue.restoreShuffle();
+                wasShuffling = true;
+            }
+
             service.play(position);
+
+            if (wasShuffling) {
+                queue.shuffle();
+            }
         }
     }
 

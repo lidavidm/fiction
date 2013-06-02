@@ -157,6 +157,8 @@ public class PlaylistsSublibraryActivity
                 queue.setContext(PlaybackQueue.QueueContext.PLAYLIST,
                                  mAdapter.getCursor());
             }
+
+            // TODO if shuffling, unshuffle, play, then reshuffle
             service.play(position);
         }
     }
