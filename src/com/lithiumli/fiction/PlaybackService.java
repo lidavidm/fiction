@@ -153,6 +153,8 @@ public class PlaybackService
         Intent intent = new Intent(EVENT_PLAYING);
         intent.putExtra(DATA_SONG, mQueue.getCurrent());
         LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+
+        showNotification();
     }
 
     @Override
