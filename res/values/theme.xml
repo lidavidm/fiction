@@ -23,6 +23,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     <style name="Theme.Fiction.NowPlaying" parent="@android:style/Theme.Holo">
         <item name="android:windowBackground">@android:color/black</item>
         <item name="android:actionBarStyle">@style/FictionActionBar.NowPlaying</item>
+        <item name="android:windowActionBarOverlay">true</item>
     </style>
     <style name="Theme.Fiction.Playlists" parent="@android:style/Theme.Holo">
         <item name="android:windowBackground">@android:color/black</item>

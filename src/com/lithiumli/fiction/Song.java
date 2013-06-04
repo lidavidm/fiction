@@ -35,12 +35,16 @@ public class Song implements Parcelable {
     private String mAlbum = "(Unknown album)";
     private Uri mAlbumArt = DEFAULT_ALBUM;
     private long mDuration;
+    private long mId;
 
     public Song(Uri uri) {
         mUri = uri;
+        mId = ContentUris.parseId(uri);
     }
 
     private Song(Parcel in) {
+        this((Uri) in.readParcelable(null));
+
         mTitle = in.readString();
         mArtist = in.readString();
         mAlbum = in.readString();
@@ -61,6 +65,10 @@ public class Song implements Parcelable {
 
     public Uri getUri() {
         return mUri;
+    }
+
+    public long getId() {
+        return mId;
     }
 
     public String getTitle() {
@@ -88,6 +96,7 @@ public class Song implements Parcelable {
     }
 
     public void writeToParcel(Parcel out, int flags) {
+        out.writeParcelable(mUri, 0);
         out.writeString(mTitle);
         out.writeString(mArtist);
         out.writeString(mAlbum);

@@ -15,17 +15,9 @@ more details.
 
 You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="240dp"
-              android:layout_height="fill_parent"
-              android:layout_gravity="left"
-              android:background="#111"
-              >
-
-    <ListView android:layout_width="fill_parent"
-              android:layout_height="fill_parent"
-              android:id="@+id/queue">
-    </ListView>
-
-</LinearLayout>
+<translate xmlns:android="http://schemas.android.com/apk/res/android"
+           android:fromYDelta="0"
+           android:toYDelta="200"
+           android:duration="300"
+           android:fillAfter="true">
+</translate>

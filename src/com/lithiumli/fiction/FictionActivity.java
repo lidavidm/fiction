@@ -22,26 +22,32 @@ import android.app.Activity;
 import android.app.ActivityOptions;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+
+import com.lithiumli.fiction.ui.UiUtils;
 
 abstract public class FictionActivity extends Activity
 {
@@ -243,6 +249,16 @@ abstract public class FictionActivity extends Activity
 
         switch (item.getItemId()) {
         case R.id.save_queue:
+            new UiUtils.Dialog(R.string.new_playlist, this) {
+                @Override
+                public void onDialogDismissed(boolean positive, String input) {
+                    if (positive && isServiceBound()) {
+                        ContentResolver resolver = getContentResolver();
+                        Playlist p = Playlist.create(resolver, input);
+                        p.addSongs(resolver, getService().getQueue().getSongs());
+                    }
+                }
+            }.show();
             return true;
         case R.id.clear_queue:
             if (isServiceBound()) {
@@ -271,6 +287,21 @@ abstract public class FictionActivity extends Activity
 
     public boolean isDrawerOpen() {
         return mDrawer.isDrawerOpen(GravityCompat.START);
+    }
+
+    // sets a margin on the queue listview to account for overlaid action
+    // bars
+    protected void setQueueMargin() {
+        TypedValue typedValue = new TypedValue();
+        getTheme().resolveAttribute(android.R.attr.actionBarSize, typedValue, true);
+        int[] attr = new int[] { android.R.attr.actionBarSize };
+        TypedArray a = obtainStyledAttributes(typedValue.data, attr);
+        int abHeight = a.getDimensionPixelSize(0, -1);
+        a.recycle();
+
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) mQueueListView.getLayoutParams();
+        params.setMargins(0, abHeight, 0, 0);
+        mQueueListView.setLayoutParams(params);
     }
 
     // EVENTS

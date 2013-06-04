@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 public class PlaybackQueue {
     public enum QueueContext {
@@ -111,6 +112,10 @@ public class PlaybackQueue {
         if (mShuffle) {
             shuffle();
         }
+    }
+
+    public List<Song> getSongs() {
+        return mSongs;
     }
 
     public int getCount() {

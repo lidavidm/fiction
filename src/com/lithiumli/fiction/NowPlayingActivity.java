@@ -89,6 +89,8 @@ public class NowPlayingActivity
 
         mRequestQueue = Volley.newRequestQueue(this);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
+
+        setQueueMargin();
     }
 
     @Override
@@ -163,6 +165,7 @@ public class NowPlayingActivity
             button.setImageResource(R.drawable.ic_menu_pause);
             break;
         case STOPPED:
+            finish();
         case PAUSED:
             button.setImageResource(R.drawable.ic_menu_play);
             break;
