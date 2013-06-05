@@ -48,7 +48,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
-import de.keyboardsurfer.android.widget.crouton.Style;
 
 import com.lithiumli.fiction.ui.UiUtils;
 
@@ -271,7 +270,7 @@ abstract public class FictionActivity extends Activity
                             String.format(
                                 getResources().getString(R.string.playlist_created),
                                 input),
-                            Style.INFO).show();
+                            UiUtils.STYLE_INFO).show();
                     }
                 }
             }.show();

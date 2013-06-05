@@ -38,9 +38,12 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 import com.lithiumli.fiction.LibraryActivity;
 import com.lithiumli.fiction.Playlist;
 import com.lithiumli.fiction.R;
+import com.lithiumli.fiction.ui.UiUtils;
 
 public class PlaylistsListFragment
     extends FictionListFragment
@@ -71,6 +74,9 @@ public class PlaylistsListFragment
             Playlist p = new Playlist(id);
             p.delete(getActivity().getContentResolver());
             mode.finish();
+            Crouton.makeText(getActivity(),
+                             R.string.playlist_deleted,
+                             UiUtils.STYLE_INFO).show();
             return true;
         default:
             return false;

@@ -5,9 +5,16 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.widget.EditText;
 
+import de.keyboardsurfer.android.widget.crouton.Style;
+
 import com.lithiumli.fiction.R;
 
 public class UiUtils {
+    public static final Style STYLE_INFO = (new Style.Builder(Style.INFO))
+        .setBackgroundDrawable(R.drawable.ab_texture_tile_fiction_crouton)
+        .setTileEnabled(true)
+        .build();
+
     public abstract static class Dialog {
         AlertDialog mDialog;
 

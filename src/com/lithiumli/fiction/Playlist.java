@@ -54,6 +54,7 @@ public class Playlist {
         resolver.insert(contentUri, value);
     }
 
+    // TODO: do this on a background thread to avoid hanging UI
     public void addSongs(ContentResolver resolver, List<Song> songs) {
         // 1. Find largest PLAY_ORDER in playlist
         Uri contentUri = MediaStore.Audio.Playlists.Members.getContentUri("external", mId);

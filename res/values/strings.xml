@@ -31,5 +31,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     <string name="clear_queue">Clear Queue</string>
     <string name="delete">Delete</string>
 
-    <string name="playlist_created">Created playlist %1$s</string>
+    <string name="playlist_created">Created playlist \'%1$s\'</string>
+    <string name="playlist_deleted">Deleted playlist</string>
+    <string name="song_enqueued">Enqueued song \'%1$s\'</string>
 </resources>

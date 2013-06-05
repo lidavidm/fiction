@@ -39,9 +39,12 @@ import android.util.Log;
 import android.support.v4.view.ViewPager;
 import android.support.v13.app.FragmentPagerAdapter;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+
 import java.util.ArrayList;
 
 import com.lithiumli.fiction.fragments.*;
+import com.lithiumli.fiction.ui.UiUtils;
 
 public class LibraryActivity
     extends FictionActivity
@@ -51,6 +54,7 @@ public class LibraryActivity
     TabsAdapter mTabsAdapter;
     TextView babSongTitle;
     TextView babSubtitle;
+    Crouton mCrouton;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -206,6 +210,17 @@ public class LibraryActivity
             }
 
             queue.enqueue(song);
+
+            if (mCrouton != null) {
+                Crouton.hide(mCrouton);
+            }
+
+            mCrouton = Crouton.makeText(
+                this,
+                String.format(getResources().getString(R.string.song_enqueued),
+                              song.getTitle()),
+                UiUtils.STYLE_INFO);
+            mCrouton.show();
         }
     }
 
