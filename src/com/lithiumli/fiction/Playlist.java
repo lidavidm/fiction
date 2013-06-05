@@ -21,6 +21,13 @@ public class Playlist {
         mId = ContentUris.parseId(uri);
     }
 
+    public Playlist(long id) {
+        mUri = ContentUris.withAppendedId(
+            MediaStore.Audio.Playlists.EXTERNAL_CONTENT_URI,
+            id);
+        mId = id;
+    }
+
     private Playlist(Parcel in) {
     }
 
@@ -30,8 +37,9 @@ public class Playlist {
 
     public void addSong(ContentResolver resolver, Song song) {
         // 1. Find largest PLAY_ORDER in playlist
+        Uri contentUri = MediaStore.Audio.Playlists.Members.getContentUri("external", mId);
         String[] projection = new String[] {MediaStore.Audio.Playlists.Members.PLAY_ORDER };
-        Cursor cursor = resolver.query(mUri, projection, null, null, null);
+        Cursor cursor = resolver.query(contentUri, projection, null, null, null);
         int position = 0;
         if (cursor.moveToLast()) {
             position = cursor.getInt(0) + 1;
@@ -43,7 +51,7 @@ public class Playlist {
         ContentValues value = new ContentValues(2);
         value.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, position);
         value.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, songId);
-        resolver.insert(mUri, value);
+        resolver.insert(contentUri, value);
     }
 
     public void addSongs(ContentResolver resolver, List<Song> songs) {
@@ -80,6 +88,10 @@ public class Playlist {
             value,
             "_id = " + mId,
             null);
+    }
+
+    public void delete(ContentResolver resolver) {
+        resolver.delete(mUri, "_id = " + mId, null);
     }
 
     public static Playlist create(ContentResolver resolver, String name) {

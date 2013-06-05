@@ -49,6 +49,7 @@ abstract public class FictionListFragment
     extends ListFragment
     implements LoaderManager.LoaderCallbacks<Cursor>,
                AdapterView.OnItemClickListener,
+               AdapterView.OnItemLongClickListener,
                FilterQueryProvider {
     protected CursorAdapter mAdapter;
 
@@ -67,6 +68,7 @@ abstract public class FictionListFragment
         setEmptyText("No songs");
 
         getListView().setOnItemClickListener(this);
+        getListView().setOnItemLongClickListener(this);
         getListView().setTextFilterEnabled(true);
 
         getLoaderManager().initLoader(0, null, this);
@@ -76,6 +78,11 @@ abstract public class FictionListFragment
 
     public void filter(String query) {
         mAdapter.getFilter().filter(query);
+    }
+
+    public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                   int position, long id) {
+        return false;
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {

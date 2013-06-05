@@ -15,19 +15,17 @@ more details.
 
 You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
-<resources>
-    <string name="app_name">Fiction Music</string>
-    <string name="drawer_open">Open Queue</string>
-    <string name="drawer_close">Close Queue</string>
-
-    <string name="play_all">Play All</string>
-    <string name="enqueue_all">Enqueue All</string>
-
-    <string name="search">Search</string>
-    <string name="new_playlist">Create New Playlist</string>
-    <string name="create">Create</string>
-    <string name="cancel">Cancel</string>
-    <string name="save_queue">Save Queue</string>
-    <string name="clear_queue">Clear Queue</string>
-    <string name="delete">Delete</string>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/play_all"
+          android:icon="@drawable/ic_menu_play"
+          android:title="@string/play_all"
+          android:showAsAction="always" />
+    <item android:id="@+id/enqueue_all"
+          android:icon="@drawable/ic_menu_enqueue"
+          android:title="@string/enqueue_all"
+          android:showAsAction="always" />
+    <item android:id="@+id/delete"
+          android:icon="@drawable/ic_menu_remove"
+          android:title="@string/delete"
+          android:showAsAction="always" />
+</menu>

@@ -29,6 +29,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,14 +39,48 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.lithiumli.fiction.LibraryActivity;
+import com.lithiumli.fiction.Playlist;
 import com.lithiumli.fiction.R;
 
 public class PlaylistsListFragment
-    extends FictionListFragment {
+    extends FictionListFragment
+    implements ActionMode.Callback {
     static final String[] PROJECTION = {
         MediaStore.Audio.Playlists._ID,
         MediaStore.Audio.Playlists.NAME,
     };
+    ActionMode mActionMode;
+
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        MenuInflater inflater = mode.getMenuInflater();
+        inflater.inflate(R.menu.playlist_context, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        return false;
+    }
+
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+        case R.id.delete:
+            Long id = (Long) mode.getTag();
+            Playlist p = new Playlist(id);
+            p.delete(getActivity().getContentResolver());
+            mode.finish();
+            return true;
+        default:
+            return false;
+        }
+    }
+
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        mActionMode = null;
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -128,6 +163,18 @@ public class PlaylistsListFragment
                             id) {
         Uri contentUri = MediaStore.Audio.Playlists.Members.getContentUri("external", id);
         ((LibraryActivity) getActivity()).onPlaylistSelected(contentUri);
+    }
+
+    @Override
+    public boolean onItemLongClick(AdapterView<?> parent, View view,
+                                   int position, long id) {
+        if (mActionMode != null) return false;
+
+        mActionMode = getActivity().startActionMode(this);
+        mActionMode.setTitle(((TextView) view.findViewById(R.id.title_text)).getText().toString());
+        mActionMode.setTag((Long) id);
+        view.setSelected(true);
+        return true;
     }
 
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
