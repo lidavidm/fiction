@@ -49,7 +49,8 @@ import com.lithiumli.fiction.Song;
 public class PlaybackService
     extends Service
     implements MediaPlayer.OnPreparedListener,
-               MediaPlayer.OnCompletionListener {
+    MediaPlayer.OnCompletionListener,
+    AudioManager.OnAudioFocusChangeListener {
     public static final String EVENT_PLAYING = "com.lithiumli.fiction.PLAYING";
     public static final String EVENT_PLAY_STATE = "com.lithiumli.fiction.PLAY_STATE";
     public static final String DATA_SONG = "com.lithiumli.fiction.SONG";
@@ -77,6 +78,7 @@ public class PlaybackService
     RepeatMode mRepeat;
     PlaybackQueue mQueue;
     public final IBinder mBinder = new LocalBinder();
+    AudioManager mAudioManager;
 
     public class LocalBinder extends Binder {
         PlaybackService getService() {
@@ -88,6 +90,8 @@ public class PlaybackService
         if (mQueue == null) {
             mQueue = new PlaybackQueue();
         }
+
+        mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
         if (intent != null && intent.getAction() != null) {
             String action = intent.getAction();
@@ -115,6 +119,10 @@ public class PlaybackService
         return mBinder;
     }
 
+    protected AudioManager getAudioManager() {
+        return mAudioManager;
+    }
+
     public void onPrepared(MediaPlayer player) {
         if (mMediaPlayer == null) {
             mMediaPlayer = player;
@@ -130,19 +138,23 @@ public class PlaybackService
             mMediaPlayer = null;
             mMediaPlayer = player;
         }
-        player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
-        player.start();
-        prepareNext();
 
-        mPaused = false;
+        if (acquireAudioFocus()) {
+            player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK);
+            player.start();
+            prepareNext();
 
-        showNotification();
+            mPaused = false;
+
+            showNotification();
+        }
     }
 
     public void onCompletion(MediaPlayer player) {
         int position = mQueue.getCurrentPosition();
 
         if (position >= mQueue.getCount() - 1) {
+            abandonAudioFocus();
             return;
         }
 
@@ -160,9 +172,26 @@ public class PlaybackService
     @Override
     public void onDestroy() {
         Log.d("fiction", "destroying service");
+        abandonAudioFocus();
         if (mMediaPlayer != null) mMediaPlayer.release();
         if (mNextPlayer != null) mNextPlayer.release();
         super.onDestroy();
+    }
+
+    public void onAudioFocusChange(int focusChange) {
+        if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT) {
+            pause();
+        }
+        else if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            // Need to sync this so that we don't react to our own events
+            if (!isPlaying()) {
+                // unpause();
+            }
+        }
+        else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            abandonAudioFocus();
+            pause();
+        }
     }
 
     // PUBLIC INTERFACE
@@ -197,6 +226,7 @@ public class PlaybackService
     public void stop() {
         hideNotification();
         broadcastPlayState(PlayState.STOPPED);
+        abandonAudioFocus();
         if (mMediaPlayer != null) {
             mMediaPlayer.release();
             mMediaPlayer = null;
@@ -231,6 +261,7 @@ public class PlaybackService
             mPaused = true;
             Log.d("fiction", "Pausing");
 
+            abandonAudioFocus();
             broadcastPlayState(PlayState.PAUSED);
             showNotification();
         }
@@ -238,17 +269,17 @@ public class PlaybackService
 
     public void unpause() {
         if (mMediaPlayer != null) {
-            mMediaPlayer.start();
             mPaused = false;
-
-            broadcastPlayState(PlayState.PLAYING);
-
-            showNotification();
+            if (acquireAudioFocus()) {
+                mMediaPlayer.start();
+                broadcastPlayState(PlayState.PLAYING);
+                showNotification();
+            }
         }
     }
 
     public boolean isPlaying() {
-        return (mMediaPlayer != null) && (mMediaPlayer.isPlaying());
+        return (mMediaPlayer != null) && (mMediaPlayer.isPlaying()) && (!mPaused);
     }
 
     public PlayState getPlayState() {
@@ -260,7 +291,27 @@ public class PlaybackService
         }
     }
 
+    public void queueChanged() {
+        prepareNext();
+    }
+
     // PRIVATE INTERFACE
+
+    private boolean acquireAudioFocus() {
+        int result = getAudioManager().requestAudioFocus(
+            this,
+            AudioManager.STREAM_MUSIC,
+            AudioManager.AUDIOFOCUS_GAIN);
+
+        if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+            return true;
+        }
+        return false;
+    }
+
+    private void abandonAudioFocus() {
+        getAudioManager().abandonAudioFocus(this);
+    }
 
     private void broadcastPlayState(PlayState state) {
         Intent intent = new Intent(EVENT_PLAY_STATE);

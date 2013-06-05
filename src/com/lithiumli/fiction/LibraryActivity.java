@@ -210,6 +210,7 @@ public class LibraryActivity
             }
 
             queue.enqueue(song);
+            service.queueChanged();
 
             if (mCrouton != null) {
                 Crouton.hide(mCrouton);
