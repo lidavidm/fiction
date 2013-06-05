@@ -85,6 +85,7 @@ public class PlaylistsListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        setEmptyText("No playlists");
 
         if (getListAdapter() == null) {
             mAdapter = new PlaylistsCursorAdapter(getActivity(), null, 0);

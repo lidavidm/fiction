@@ -145,7 +145,6 @@ public class PlaylistsSublibraryActivity
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long
                             id) {
-        position -= 1; // compensate for header view
         if (isServiceBound()) {
             PlaybackService service = getService();
             PlaybackQueue queue = service.getQueue();

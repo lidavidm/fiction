@@ -47,6 +47,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 
+import de.keyboardsurfer.android.widget.crouton.Crouton;
+import de.keyboardsurfer.android.widget.crouton.Style;
+
 import com.lithiumli.fiction.ui.UiUtils;
 
 abstract public class FictionActivity extends Activity
@@ -105,6 +108,12 @@ abstract public class FictionActivity extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onDestroy() {
+        Crouton.clearCroutonsForActivity(this);
+        super.onDestroy();
     }
 
     public void initializeDrawer(boolean indicator) {
@@ -256,6 +265,13 @@ abstract public class FictionActivity extends Activity
                         ContentResolver resolver = getContentResolver();
                         Playlist p = Playlist.create(resolver, input);
                         p.addSongs(resolver, getService().getQueue().getSongs());
+                        mDrawer.closeDrawers();
+                        Crouton.makeText(
+                            FictionActivity.this,
+                            String.format(
+                                getResources().getString(R.string.playlist_created),
+                                input),
+                            Style.INFO).show();
                     }
                 }
             }.show();

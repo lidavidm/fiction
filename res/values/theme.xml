@@ -25,10 +25,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
         <item name="android:actionBarStyle">@style/FictionActionBar.NowPlaying</item>
         <item name="android:windowActionBarOverlay">true</item>
     </style>
-    <style name="Theme.Fiction.Playlists" parent="@android:style/Theme.Holo">
-        <item name="android:windowBackground">@android:color/black</item>
-        <item name="android:actionBarStyle">@style/FictionActionBar.Playlists</item>
-    </style>
     <style name="FictionActionBar" parent="@android:style/Widget.Holo.ActionBar">
         <item name="android:background">@drawable/ab_background_textured_fiction</item>
         <item name="android:titleTextStyle">@style/FictionActionBar.Title</item>
@@ -46,9 +42,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     </style>
     <style name="FictionActionBar.NowPlaying" parent="@style/FictionActionBar">
         <item name="android:background">@drawable/ab_background_textured_fiction_np</item>
-    </style>
-    <style name="FictionActionBar.Playlists" parent="@style/FictionActionBar">
-        <item name="android:background">@drawable/ab_background_textured_fiction_pl</item>
     </style>
 
     <style name="Title">

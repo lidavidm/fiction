@@ -22,7 +22,7 @@
         </activity>
         <activity android:name="PlaylistsSublibraryActivity"
                   android:label="@string/app_name"
-                  android:theme="@style/Theme.Fiction.Playlists">
+                  android:theme="@style/Theme.Fiction">
         </activity>
         <service android:name="PlaybackService" />
     </application>
