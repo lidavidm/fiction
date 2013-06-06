@@ -172,7 +172,7 @@ public class AlbumSwiper extends View {
         Song prev = null, current = null, next = null;
 
         double r = (int) (getWidth() / 3.0);
-        double theta = -Math.PI / 2;
+        double theta = -Math.PI / 4;
         mCovers = new ArrayList<Cover>(3);
         for (int posOffset = -1; posOffset <= 1; posOffset ++) {
             int index = position + posOffset;
