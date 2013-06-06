@@ -130,9 +130,7 @@ abstract public class FictionActivity extends Activity
                     if (isServiceBound()) {
                         getService().play(position);
 
-                        if (mAdapter != null) {
-                            mAdapter.notifyDataSetChanged();
-                        }
+                        mDrawer.closeDrawers();
                     }
                 }
             });
