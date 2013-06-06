@@ -129,6 +129,7 @@ public class NowPlayingActivity
         mSongArtist.setText(song.getArtist());
 
         mCoverPager.updateCovers();
+        mCoverPager.postInvalidate();
 
         if (song.getArtist().equals("<unknown>")) {
             ((ImageView) findViewById(R.id.background_image)).setImageDrawable(new ColorDrawable(0xFF000000));

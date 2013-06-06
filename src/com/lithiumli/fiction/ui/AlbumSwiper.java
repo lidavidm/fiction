@@ -97,7 +97,7 @@ public class AlbumSwiper extends View {
             mStartX = 0f;
             mStartY = 0f;
             if (mTheta >= Math.PI / 5) {
-                scrollTo(Math.PI / 5, new Runnable() {
+                scrollTo(Math.PI / 4, new Runnable() {
                         @Override
                         public void run() {
                             if (mListener != null) {
@@ -107,7 +107,7 @@ public class AlbumSwiper extends View {
                     });
             }
             else if (mTheta <= -Math.PI / 5) {
-                scrollTo(-Math.PI / 5, new Runnable() {
+                scrollTo(-Math.PI / 4, new Runnable() {
                         @Override
                         public void run() {
                             if (mListener != null) {
