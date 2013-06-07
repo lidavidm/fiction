@@ -42,31 +42,19 @@ import android.util.Log;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.Volley;
-
 import com.lithiumli.fiction.ui.AlbumSwiper;
 import com.lithiumli.fiction.util.BitmapLruCache;
 
 public class NowPlayingActivity
     extends FictionActivity
+    implements ArtistImageCache.CacheCallback
 {
     static final String ECHO_NEST_URL = "http://developer.echonest.com/api/v4/artist/images?api_key=ETDSSZR6RAMYOU4SI&results=1&name=";
     TextView mSongName;
     TextView mSongAlbum;
     TextView mSongArtist;
     AlbumSwiper mCoverPager;
-    RequestQueue mRequestQueue;
-    ImageLoader mImageLoader;
+    ArtistImageCache mCache;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -87,8 +75,7 @@ public class NowPlayingActivity
         ab.setTitle("Now Playing");
         ab.setSubtitle("Fiction Music");
 
-        mRequestQueue = Volley.newRequestQueue(this);
-        mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
+        mCache = new ArtistImageCache(this);
 
         setQueueMargin();
     }
@@ -135,26 +122,8 @@ public class NowPlayingActivity
             ((ImageView) findViewById(R.id.background_image)).setImageDrawable(new ColorDrawable(0xFF000000));
             return;
         };
-        String artist;
-        try {
-            artist = java.net.URLEncoder.encode(song.getArtist(), "UTF-8");
-        }
-        catch (java.io.UnsupportedEncodingException e) {
-            return;
-        }
 
-        JsonObjectRequest req = new JsonObjectRequest(
-            Method.GET,
-            ECHO_NEST_URL + artist,
-            null,
-            new VolleyListener(),
-            new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    Log.d("fiction", "error");
-                }
-            });
-        mRequestQueue.add(req);
+        mCache.getImage(song.getArtist(), this);
     }
 
     @Override
@@ -195,41 +164,14 @@ public class NowPlayingActivity
         }
     }
 
-    class VolleyListener implements Response.Listener<JSONObject> {
-        @Override
-            public void onResponse(JSONObject response) {
-            try {
-                response = response.getJSONObject("response");
-                JSONArray images = response.getJSONArray("images");
-
-                if (images.length() > 0) {
-                    JSONObject image = images.getJSONObject(0);
-                    String url = image.getString("url");
-                    mImageLoader.get(url, new VolleyImageListener());
-                }
-            }
-            catch (JSONException e) {
-                Log.d("fiction", "response error");
-            }
+    public void onImageFound(Bitmap bitmap) {
+        if (bitmap != null) {
+            ((ImageView) findViewById(R.id.background_image)).setImageBitmap(
+                bitmap);
         }
-    }
-
-    class VolleyImageListener implements ImageLoader.ImageListener {
-        @Override
-        public void onErrorResponse(VolleyError e) {
-            // image load error
-        }
-
-        @Override
-        public void onResponse(ImageLoader.ImageContainer response, boolean isImmediate) {
-            if (response.getBitmap() != null) {
-                ((ImageView) NowPlayingActivity.this.findViewById(R.id.background_image)).setImageBitmap(response.getBitmap());
-            }
-            else {
-                ((ImageView)
-        NowPlayingActivity.this.findViewById(R.id.background_image)).setImageDrawable(new
-                                                                                      ColorDrawable(0xFF000000));
-            }
+        else {
+            ((ImageView) findViewById(R.id.background_image)).setImageDrawable(
+                new ColorDrawable(0xFF000000));
         }
     }
 }

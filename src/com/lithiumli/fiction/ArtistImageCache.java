@@ -22,10 +22,12 @@ public class ArtistImageCache {
     static final String ECHO_NEST_URL = "http://developer.echonest.com/api/v4/artist/images?api_key=ETDSSZR6RAMYOU4SI&results=1&name=";
     final RequestQueue mRequestQueue;
     final ImageLoader mImageLoader;
+    final BitmapLruCache mCache;
 
     public ArtistImageCache(Context context) {
+        mCache = new BitmapLruCache();
         mRequestQueue = Volley.newRequestQueue(context);
-        mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
+        mImageLoader = new ImageLoader(mRequestQueue, new FakeCache());
     }
 
     public void getImage(String artist, CacheCallback callback) {
@@ -36,11 +38,17 @@ public class ArtistImageCache {
             return;
         }
 
+        Bitmap cached = mCache.getBitmap(artist);
+
+        if (cached != null) {
+            callback.onImageFound(cached);
+        }
+
         JsonObjectRequest req = new JsonObjectRequest(
             Method.GET,
             ECHO_NEST_URL + artist,
             null,
-            new VolleyListener(callback),
+            new VolleyListener(artist, callback),
             new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
@@ -57,8 +65,10 @@ public class ArtistImageCache {
     class VolleyListener implements Response.Listener<JSONObject> {
         // TODO use weak reference
         CacheCallback mCallback;
+        String mArtist;
 
-        public VolleyListener(CacheCallback callback) {
+        public VolleyListener(String artist, CacheCallback callback) {
+            mArtist = artist;
             mCallback = callback;
         }
 
@@ -71,7 +81,7 @@ public class ArtistImageCache {
                 if (images.length() > 0) {
                     JSONObject image = images.getJSONObject(0);
                     String url = image.getString("url");
-                    mImageLoader.get(url, new VolleyImageListener(mCallback));
+                    mImageLoader.get(url, new VolleyImageListener(mArtist, mCallback));
                 }
             }
             catch (JSONException e) {
@@ -82,8 +92,10 @@ public class ArtistImageCache {
 
     class VolleyImageListener implements ImageLoader.ImageListener {
         CacheCallback mCallback;
+        String mArtist;
 
-        public VolleyImageListener(CacheCallback callback) {
+        public VolleyImageListener(String artist, CacheCallback callback) {
+            mArtist = artist;
             mCallback = callback;
         }
 
@@ -95,7 +107,21 @@ public class ArtistImageCache {
         @Override
         public void onResponse(ImageLoader.ImageContainer response,
                                boolean isImmediate) {
+            Bitmap b = response.getBitmap();
+
+            if (b != null) {
+                mCache.putBitmap(mArtist, b);
+            }
             mCallback.onImageFound(response.getBitmap());
+        }
+    }
+
+    class FakeCache implements ImageLoader.ImageCache {
+        public Bitmap getBitmap(String url) {
+            return null;
+        }
+
+        public void putBitmap(String url, Bitmap bitmap) {
         }
     }
 }

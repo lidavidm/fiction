@@ -12,7 +12,7 @@ import com.lithiumli.fiction.R;
 abstract public class FictionCursorAdapter extends CursorAdapter {
     private Cursor mCursor;
     private Context mContext;
-    private final LayoutInflater mInflater;
+    protected final LayoutInflater mInflater;
 
     public FictionCursorAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);

@@ -68,9 +68,11 @@ public class LibraryActivity
         mViewPager.setOnPageChangeListener(this);
 
         mTabsAdapter = new TabsAdapter(this, mViewPager);
+        mTabsAdapter.addTab("Artists", ArtistsGridFragment.class, null);
         mTabsAdapter.addTab("Songs", SongsListFragment.class, null);
         mTabsAdapter.addTab("Playlists", PlaylistsListFragment.class, null);
         mViewPager.setAdapter(mTabsAdapter);
+        mViewPager.setCurrentItem(1);
 
         babSongTitle = (TextView) findViewById(R.id.bab_song_name);
         babSubtitle = (TextView) findViewById(R.id.bab_song_subtitle);
@@ -249,7 +251,7 @@ public class LibraryActivity
             public final Class<?> clss;
             public final Bundle args;
             public final String title;
-            public FictionListFragment fragment;
+            // public FictionListFragment fragment;
 
             public TabInfo(Class<?> _class, Bundle _args, String _title) {
                 clss = _class;
@@ -279,8 +281,9 @@ public class LibraryActivity
         @Override
         public Fragment getItem(int position) {
             TabInfo info = mTabs.get(position);
-            info.fragment = (FictionListFragment) Fragment.instantiate(mContext, info.clss.getName(), info.args);
-            return info.fragment;
+            return Fragment.instantiate(mContext, info.clss.getName(), info.args);
+            // info.fragment = (FictionListFragment) Fragment.instantiate(mContext, info.clss.getName(), info.args);
+            // return info.fragment;
         }
 
         @Override
@@ -288,8 +291,8 @@ public class LibraryActivity
             return mTabs.get(position).title;
         }
 
-        public FictionListFragment getFragment(int position) {
-            return mTabs.get(position).fragment;
-        }
+        // public FictionListFragment getFragment(int position) {
+        //     return mTabs.get(position).fragment;
+        // }
     }
 }

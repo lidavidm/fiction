@@ -49,6 +49,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                           android:gravity="bottom"
                           style="@style/Title"
                           android:singleLine="false"
+                          android:textSize="22sp"
                           />
                 <TextView android:id="@+id/np_song_album"
                           android:text="Album"

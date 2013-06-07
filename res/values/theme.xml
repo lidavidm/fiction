@@ -37,10 +37,11 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     <style name="FictionActionBar.Subtitle"
        parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Subtitle">
         <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">sans-serif-light</item>
         <item name="android:textAllCaps">true</item>
     </style>
     <style name="FictionActionBar.NowPlaying" parent="@style/FictionActionBar">
-        <item name="android:background">@drawable/ab_background_textured_fiction_np</item>
+        <item name="android:background">#00000000</item>
     </style>
 
     <style name="Title">
