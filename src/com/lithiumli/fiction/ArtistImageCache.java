@@ -21,6 +21,7 @@ import uk.co.senab.bitmapcache.BitmapLruCache;
 import uk.co.senab.bitmapcache.CacheableBitmapDrawable;
 
 import com.android.volley.Network;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -38,6 +39,7 @@ public class ArtistImageCache {
     final ImageLoader mImageLoader;
     final BitmapLruCache mCache;
     final Resources mResources;
+    AsyncTask mTask = null;
 
     public ArtistImageCache(Context context) {
         mRequestQueue = newRequestQueue(context);
@@ -84,8 +86,23 @@ public class ArtistImageCache {
         return mCache;
     }
 
+    public void cancelAll() {
+        mRequestQueue.cancelAll(new RequestQueue.RequestFilter() {
+                @Override
+                public boolean apply(Request<?> request) {
+                    return true;
+                }
+            });
+        if (mTask != null) {
+            mTask.cancel(true);
+        }
+    }
+
     public void getImage(String artist, CacheCallback callback) {
-        new CheckCacheTask()
+        if (mTask != null) {
+            mTask.cancel(true);
+        }
+        mTask = new CheckCacheTask()
             .execute(new CheckCacheParams(escapeArtist(artist), callback));
     }
 

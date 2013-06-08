@@ -124,6 +124,7 @@ public class NowPlayingActivity
             return;
         };
 
+        mCache.cancelAll();
         mCache.getImage(song.getArtist(), this);
     }
 
