@@ -39,9 +39,12 @@ public class ArtistImageCache {
     final ImageLoader mImageLoader;
     final BitmapLruCache mCache;
     final Resources mResources;
+    final Context mContext;
+    static ArtistImageCache mInstance;
     AsyncTask mTask = null;
 
-    public ArtistImageCache(Context context) {
+    ArtistImageCache(Context context) {
+        mContext = context;
         mRequestQueue = newRequestQueue(context);
         mImageLoader = new ImageLoader(mRequestQueue, new FakeCache());
         mResources = context.getResources();
@@ -54,32 +57,15 @@ public class ArtistImageCache {
         builder.setMemoryCacheEnabled(true).setMemoryCacheMaxSizeUsingHeapSize();
         builder.setDiskCacheEnabled(true).setDiskCacheLocation(cacheLocation);
         mCache = builder.build();
+
+        android.util.Log.d("fiction", "init cache");
     }
 
-    public static String escapeArtist(String artist) {
-        try {
-            return java.net.URLEncoder.encode(artist, "UTF-8");
+    public static ArtistImageCache getInstance(Context context) {
+        if (mInstance == null) {
+            mInstance = new ArtistImageCache(context);
         }
-        catch (java.io.UnsupportedEncodingException e) {
-        }
-        return artist;
-    }
-
-    public static String getCacheKey(String artist) {
-        // https://gist.github.com/avilches/750151
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            md.update(artist.getBytes());
-
-            StringBuffer result = new StringBuffer();
-            for (byte byt : md.digest()) {
-                result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
-            }
-            return result.toString();
-        }
-        catch (NoSuchAlgorithmException e) {
-        }
-        return "";
+        return mInstance;
     }
 
     public BitmapLruCache getCache() {
@@ -145,6 +131,33 @@ public class ArtistImageCache {
         return queue;
     }
 
+    public static String escapeArtist(String artist) {
+        try {
+            return java.net.URLEncoder.encode(artist, "UTF-8");
+        }
+        catch (java.io.UnsupportedEncodingException e) {
+        }
+        return artist;
+    }
+
+    public static String getCacheKey(String artist) {
+        return artist;
+        // https://gist.github.com/avilches/750151
+        // try {
+        //     MessageDigest md = MessageDigest.getInstance("SHA-256");
+        //     md.update(artist.getBytes());
+
+        //     StringBuffer result = new StringBuffer();
+        //     for (byte byt : md.digest()) {
+        //         result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
+        //     }
+        //     return result.toString();
+        // }
+        // catch (NoSuchAlgorithmException e) {
+        // }
+        // return "";
+    }
+
     public interface CacheCallback {
         void onImageFound(BitmapDrawable bitmap);
     }
@@ -197,6 +210,8 @@ public class ArtistImageCache {
             Bitmap b = response.getBitmap();
 
             if (b != null) {
+                android.util.Log.d("fiction", "Storing from URL artist " + mArtist);
+                android.util.Log.d("fiction", getCacheKey(mArtist));
                 storeImage(getCacheKey(mArtist), b);
             }
 
@@ -243,15 +258,18 @@ public class ArtistImageCache {
             callback = params[0].callback;
 
             String key = ArtistImageCache.getCacheKey(artist);
+            android.util.Log.d("fiction", "Checking " + artist + " " + key);
             return getCache().get(key);
         }
 
         @Override
         protected void onPostExecute(CacheableBitmapDrawable result) {
             if (result != null) {
+                android.util.Log.d("fiction", "Found in cache " + artist);
                 callback.onImageFound(result);
             }
             else {
+                android.util.Log.d("fiction", "Loading " + artist);
                 ArtistImageCache.this.loadImage(artist, callback);
             }
         }

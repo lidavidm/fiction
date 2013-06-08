@@ -25,6 +25,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -32,6 +33,8 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,6 +45,9 @@ import android.util.Log;
 
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 
 import com.lithiumli.fiction.ui.AlbumSwiper;
 import com.lithiumli.fiction.util.BitmapLruCache;
@@ -76,9 +82,23 @@ public class NowPlayingActivity
         ab.setTitle("Now Playing");
         ab.setSubtitle("Fiction Music");
 
-        mCache = new ArtistImageCache(this);
+        mCache = ArtistImageCache.getInstance(this);
 
         setQueueMargin();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.now_playing, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        boolean drawerOpen = isDrawerOpen();
+        menu.findItem(R.id.select_artist_image).setVisible(!drawerOpen);
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -94,6 +114,8 @@ public class NowPlayingActivity
             startActivity(parentIntent, options.toBundle());
             finish();
             return true;
+        case R.id.select_artist_image:
+            selectArtistImage();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -125,6 +147,7 @@ public class NowPlayingActivity
         };
 
         mCache.cancelAll();
+        android.util.Log.d("fiction", "getting " + song.getArtist());
         mCache.getImage(song.getArtist(), this);
     }
 
@@ -173,6 +196,43 @@ public class NowPlayingActivity
         }
         else {
             view.setImageDrawable(new ColorDrawable(0xFF000000));
+        }
+    }
+
+    private static final int SELECT_PHOTO = 42;
+    // TODO XXX ugh (causes NPE trying to getService())
+    private String editingArtist;
+    public void selectArtistImage() {
+        Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
+        photoPickerIntent.setType("image/*");
+        editingArtist = getService().getQueue().getCurrent().getArtist();
+        startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode,
+                                    Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+
+        switch(requestCode) {
+        case SELECT_PHOTO:
+            if (resultCode == RESULT_OK) {
+                // TODO move to background thread
+                android.util.Log.d("fiction", editingArtist);
+                String key = mCache.getCacheKey(mCache.escapeArtist(editingArtist));
+                Uri image = intent.getData();
+
+                try {
+                    InputStream imageStream = getContentResolver()
+                        .openInputStream(image);
+                    Bitmap b = BitmapFactory.decodeStream(imageStream);
+
+                    mCache.storeImage(key, b);
+                    mCache.getImage(editingArtist, this);
+                }
+                catch (FileNotFoundException e) {
+                }
+            }
         }
     }
 }
