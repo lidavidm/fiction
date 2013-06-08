@@ -28,6 +28,7 @@ import android.graphics.Bitmap;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
@@ -164,14 +165,13 @@ public class NowPlayingActivity
         }
     }
 
-    public void onImageFound(Bitmap bitmap) {
+    public void onImageFound(BitmapDrawable bitmap) {
+        ImageView view = (ImageView) findViewById(R.id.background_image);
         if (bitmap != null) {
-            ((ImageView) findViewById(R.id.background_image)).setImageBitmap(
-                bitmap);
+            view.setImageDrawable(bitmap);
         }
         else {
-            ((ImageView) findViewById(R.id.background_image)).setImageDrawable(
-                new ColorDrawable(0xFF000000));
+            view.setImageDrawable(new ColorDrawable(0xFF000000));
         }
     }
 }
