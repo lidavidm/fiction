@@ -186,6 +186,7 @@ public class NowPlayingActivity
             }
 
             mCoverPager.updateCovers();
+            mCoverPager.postInvalidate();
         }
     }
 
