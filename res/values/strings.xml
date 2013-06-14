@@ -34,5 +34,5 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 
     <string name="playlist_created">Created playlist \'%1$s\'</string>
     <string name="playlist_deleted">Deleted playlist</string>
-    <string name="song_enqueued">Enqueued song \'%1$s\'</string>
+    <string name="song_enqueued">Enqueued \'%1$s\'</string>
 </resources>
