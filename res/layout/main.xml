@@ -17,6 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawer"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -30,6 +31,14 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
             android:layout_height="0dp"
             android:layout_weight="1"
             />
+        <com.viewpagerindicator.LinePageIndicator
+            android:id="@+id/view_pager_indicator"
+            android:layout_height="wrap_content"
+            android:layout_width="fill_parent"
+            app:strokeWidth="3dp"
+            app:lineWidth="80dp"
+            app:unselectedColor="#FFFFFFFF"
+            app:selectedColor="#FF9933CC" />
         <include layout="@layout/bab_hr" />
         <include layout="@layout/bab" />
     </LinearLayout>

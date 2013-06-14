@@ -41,6 +41,8 @@ import android.support.v13.app.FragmentPagerAdapter;
 
 import de.keyboardsurfer.android.widget.crouton.Crouton;
 
+import com.viewpagerindicator.LinePageIndicator;
+
 import java.util.ArrayList;
 
 import com.lithiumli.fiction.fragments.*;
@@ -55,6 +57,7 @@ public class LibraryActivity
     TextView babSongTitle;
     TextView babSubtitle;
     Crouton mCrouton;
+    LinePageIndicator mIndicator;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -65,13 +68,18 @@ public class LibraryActivity
         initializeDrawer(true);
 
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
-        mViewPager.setOnPageChangeListener(this);
 
         mTabsAdapter = new TabsAdapter(this, mViewPager);
         mTabsAdapter.addTab("Artists", ArtistsGridFragment.class, null);
         mTabsAdapter.addTab("Songs", SongsListFragment.class, null);
         mTabsAdapter.addTab("Playlists", PlaylistsListFragment.class, null);
         mViewPager.setAdapter(mTabsAdapter);
+
+        mIndicator = (LinePageIndicator)
+            findViewById(R.id.view_pager_indicator);
+        mIndicator.setViewPager(mViewPager);
+        mIndicator.setOnPageChangeListener(this);
+
         mViewPager.setCurrentItem(1);
 
         babSongTitle = (TextView) findViewById(R.id.bab_song_name);
@@ -146,6 +154,11 @@ public class LibraryActivity
         default:
             break;
         }
+    }
+
+    // TODO move this stuff into a fragment
+    private boolean isPlayerInfoShowing() {
+        return findViewById(R.id.bab).getVisibility() == View.VISIBLE;
     }
 
     private void showPlayerInfo() {
@@ -233,7 +246,10 @@ public class LibraryActivity
                 UiUtils.STYLE_INFO);
             mCrouton.show();
 
-            showPlayerInfo();
+            if (!isPlayerInfoShowing()) {
+                onSongChange(queue.getCurrent());
+                showPlayerInfo();
+            }
         }
     }
 
@@ -241,6 +257,21 @@ public class LibraryActivity
     public void onPageSelected(int position) {
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(mTabsAdapter.getPageTitle(position));
+
+        // TODO: replace with something better
+        switch (position) {
+        case 0:
+            mIndicator.setSelectedColor(0xFF9933CC);
+            break;
+        case 1:
+            mIndicator.setSelectedColor(0xFFFF8800);
+            break;
+        case 2:
+            mIndicator.setSelectedColor(0xFFCC0000);
+            break;
+        default:
+            mIndicator.setSelectedColor(0xFF9933CC);
+        }
     }
 
     @Override
