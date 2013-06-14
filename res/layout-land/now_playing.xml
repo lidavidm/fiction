@@ -21,29 +21,29 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout android:orientation="horizontal"
-                  android:layout_width="fill_parent"
-                  android:layout_height="fill_parent">
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
         <com.lithiumli.fiction.ui.AlbumSwiper
             android:id="@+id/cover_pager"
             android:layout_width="0dp"
             android:layout_weight="1"
-            android:layout_height="fill_parent"
+            android:layout_height="match_parent"
             />
         <FrameLayout android:layout_width="0dp"
                      android:layout_weight="1"
-                     android:layout_height="fill_parent">
+                     android:layout_height="match_parent">
             <ImageView android:id="@+id/background_image"
-                       android:layout_width="fill_parent"
-                       android:layout_height="fill_parent"
+                       android:layout_width="match_parent"
+                       android:layout_height="match_parent"
                        android:scaleType="centerCrop" />
             <LinearLayout android:orientation="vertical"
-                          android:layout_width="fill_parent"
-                          android:layout_height="fill_parent"
+                          android:layout_width="match_parent"
+                          android:layout_height="match_parent"
                           android:background="#99000000"
                           android:paddingLeft="12dp">
                 <TextView android:id="@+id/np_song_name"
                           android:text="Song Name"
-                          android:layout_width="fill_parent"
+                          android:layout_width="match_parent"
                           android:layout_height="0dp"
                           android:layout_weight="1"
                           android:gravity="bottom"
@@ -53,7 +53,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                           />
                 <TextView android:id="@+id/np_song_album"
                           android:text="Album"
-                          android:layout_width="fill_parent"
+                          android:layout_width="match_parent"
                           android:layout_height="0dp"
                           android:layout_weight="1"
                           android:gravity="center_vertical"
@@ -70,7 +70,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                           android:singleLine="false"
                           />
 
-                <LinearLayout android:layout_width="fill_parent"
+                <LinearLayout android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:orientation="horizontal">
                     <ImageButton android:id="@+id/np_shuffle"

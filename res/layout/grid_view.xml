@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <GridView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/gridview"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:numColumns="2"
     android:verticalSpacing="5dp"
     android:horizontalSpacing="5dp"

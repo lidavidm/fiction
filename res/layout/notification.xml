@@ -17,8 +17,8 @@ You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/notification"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <ImageView
         android:id="@+id/notification_cover"

@@ -16,7 +16,7 @@ more details.
 You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-    <LinearLayout android:layout_width="fill_parent"
+    <LinearLayout android:layout_width="match_parent"
                   android:layout_height="wrap_content"
                   android:orientation="horizontal"
                   android:id="@+id/bab"
@@ -24,7 +24,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                   >
         <LinearLayout android:id="@+id/bab_info"
                       android:layout_width="0dp"
-                      android:layout_height="fill_parent"
+                      android:layout_height="match_parent"
                       android:orientation="vertical"
                       android:layout_weight="1"
                       >

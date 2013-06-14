@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
     <View android:id="@+id/bab_hr"
-          android:layout_width="fill_parent"
+          android:layout_width="match_parent"
           android:layout_height="2dp"
           android:background="@color/songs_header" />
 </merge>
