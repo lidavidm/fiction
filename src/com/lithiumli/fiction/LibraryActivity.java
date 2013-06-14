@@ -117,14 +117,7 @@ public class LibraryActivity
 
     @Override
     public void onSongChange(Song song) {
-        View bab = findViewById(R.id.bab);
-        View bab_hr = findViewById(R.id.bab_hr);
-        if (bab.getVisibility() == View.GONE) {
-            bab.setVisibility(View.VISIBLE);
-            Animation showBab = AnimationUtils.loadAnimation(this, R.anim.bab);
-            bab.startAnimation(showBab);
-            bab_hr.startAnimation(showBab);
-        }
+        showPlayerInfo();
 
         babSongTitle.setText(song.getTitle());
         babSubtitle.setText(song.getArtist() + " - " + song.getAlbum());
@@ -146,19 +139,34 @@ public class LibraryActivity
             button.setImageResource(R.drawable.ic_menu_pause);
             break;
         case STOPPED:
-            View bab = findViewById(R.id.bab);
-            View bab_hr = findViewById(R.id.bab_hr);
-            if (bab.getVisibility() == View.VISIBLE) {
-                Animation hideBab = AnimationUtils.loadAnimation(this, R.anim.bab_hide);
-                bab.startAnimation(hideBab);
-                bab_hr.startAnimation(hideBab);
-                bab.setVisibility(View.GONE);
-            }
+            hidePlayerInfo();
         case PAUSED:
             button.setImageResource(R.drawable.ic_menu_play);
             break;
         default:
             break;
+        }
+    }
+
+    private void showPlayerInfo() {
+        View bab = findViewById(R.id.bab);
+        View bab_hr = findViewById(R.id.bab_hr);
+        if (bab.getVisibility() == View.GONE) {
+            bab.setVisibility(View.VISIBLE);
+            Animation showBab = AnimationUtils.loadAnimation(this, R.anim.bab);
+            bab.startAnimation(showBab);
+            bab_hr.startAnimation(showBab);
+        }
+    }
+
+    private void hidePlayerInfo() {
+        View bab = findViewById(R.id.bab);
+        View bab_hr = findViewById(R.id.bab_hr);
+        if (bab.getVisibility() == View.VISIBLE) {
+            Animation hideBab = AnimationUtils.loadAnimation(this, R.anim.bab_hide);
+            bab.startAnimation(hideBab);
+            bab_hr.startAnimation(hideBab);
+            bab.setVisibility(View.GONE);
         }
     }
 
@@ -207,8 +215,8 @@ public class LibraryActivity
 
                 if (currentSong != null) {
                     queue.enqueue(currentSong);
-                    queue.setCurrent(0);
                 }
+                queue.setCurrent(0);
             }
 
             queue.enqueue(song);
@@ -224,6 +232,8 @@ public class LibraryActivity
                               song.getTitle()),
                 UiUtils.STYLE_INFO);
             mCrouton.show();
+
+            showPlayerInfo();
         }
     }
 
