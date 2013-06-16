@@ -195,7 +195,9 @@ public class NowPlayingActivity
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        mCurrentAnim.end();
+        if (mCurrentAnim != null) {
+            mCurrentAnim.end();
+        }
 
         mSongName.setAlpha(1.0f);
         mSongAlbum.setAlpha(1.0f);
