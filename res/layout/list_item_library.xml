@@ -34,8 +34,8 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                   android:scrollHorizontally="true"
                   android:ellipsize="end"
                   android:singleLine="true"
-                  android:textStyle="bold"
                   android:textColor="#FFF"
+                  android:textSize="16sp"
                   android:gravity="center_vertical"
                   />
 
@@ -48,6 +48,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                   android:ellipsize="end"
                   android:singleLine="true"
                   android:gravity="center_vertical"
+                  android:textSize="12sp"
                   />
     </LinearLayout>
 

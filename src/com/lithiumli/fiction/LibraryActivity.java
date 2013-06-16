@@ -86,8 +86,8 @@ public class LibraryActivity
         babSubtitle = (TextView) findViewById(R.id.bab_song_subtitle);
         babSubtitle.setSelected(true);
 
-        getActionBar().setSubtitle("Library");
-        getActionBar().setTitle("Songs");
+        getActionBar().setSubtitle("Songs");
+        getActionBar().setTitle("Library");
 
         initializeBottomActionBar();
     }
@@ -256,7 +256,7 @@ public class LibraryActivity
     @Override
     public void onPageSelected(int position) {
         ActionBar actionBar = getActionBar();
-        actionBar.setTitle(mTabsAdapter.getPageTitle(position));
+        actionBar.setSubtitle(mTabsAdapter.getPageTitle(position));
 
         // TODO: replace with something better
         switch (position) {
