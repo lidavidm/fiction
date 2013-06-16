@@ -18,6 +18,8 @@
 
 package com.lithiumli.fiction;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.ActivityOptions;
 import android.app.ActionBar;
@@ -32,10 +34,14 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
@@ -62,6 +68,10 @@ public class NowPlayingActivity
     TextView mSongArtist;
     AlbumSwiper mCoverPager;
     ArtistImageCache mCache;
+    AnimatorSet mCurrentAnim;
+    Looper mLooper;
+    Handler mHandler;
+    FadeOut mFadeOut;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,12 +90,26 @@ public class NowPlayingActivity
         ActionBar ab = getActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setTitle("Now Playing");
-        ab.setSubtitle("Fiction Music");
 
         mCache = ArtistImageCache.getInstance(this);
 
         setQueueMargin();
+
+        HandlerThread thread = new HandlerThread("thread");
+        thread.start();
+
+        mLooper = thread.getLooper();
+        mHandler = new Handler(mLooper);
+
+        mFadeOut = new FadeOut();
+        mHandler.postDelayed(mFadeOut, 2000);
     }
+
+    // @Override
+    // public void onPause() {
+    //     super.onPause();
+    //     mLooper.quit();
+    // }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -169,6 +193,24 @@ public class NowPlayingActivity
         }
     }
 
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        mCurrentAnim.end();
+
+        mSongName.setAlpha(1.0f);
+        mSongAlbum.setAlpha(1.0f);
+        mSongArtist.setAlpha(1.0f);
+        mCoverPager.setAlpha(1.0f);
+
+        if (mFadeOut != null) {
+            mHandler.removeCallbacks(mFadeOut);
+        }
+        mFadeOut = new FadeOut();
+        mHandler.postDelayed(mFadeOut, 2000);
+
+        return super.dispatchTouchEvent(ev);
+    }
+
     public void shuffleButton(View view) {
         ImageButton button = (ImageButton) view;
 
@@ -233,6 +275,34 @@ public class NowPlayingActivity
                 }
                 catch (FileNotFoundException e) {
                 }
+            }
+        }
+    }
+
+    class FadeOut implements Runnable {
+        @Override
+        public void run() {
+            runOnUiThread(new FadeOutInner());
+        }
+
+        class FadeOutInner implements Runnable {
+            @Override
+            public void run() {
+                mCurrentAnim = new AnimatorSet();
+                ObjectAnimator a1 = ObjectAnimator.ofFloat(mSongName, "alpha", 1.0f, 0.0f);
+                ObjectAnimator a2 = ObjectAnimator.ofFloat(mSongAlbum, "alpha", 1.0f, 0.0f);
+                ObjectAnimator a3 = ObjectAnimator.ofFloat(mSongArtist, "alpha", 1.0f, 0.0f);
+                ObjectAnimator a4 = ObjectAnimator.ofFloat(mCoverPager, "alpha", 1.0f, 0.5f);
+                a1.setDuration(300);
+                a2.setDuration(400);
+                a3.setDuration(500);
+                a4.setDuration(700);
+
+                mCurrentAnim.play(a1);
+                mCurrentAnim.play(a2).after(100);
+                mCurrentAnim.play(a3).after(200);
+                mCurrentAnim.play(a4);
+                mCurrentAnim.start();
             }
         }
     }
