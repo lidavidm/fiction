@@ -35,8 +35,6 @@ abstract public class SublibraryActivity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-
-        getActionBar().setSubtitle("Fiction Music");
     }
 
     @Override

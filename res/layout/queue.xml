@@ -28,4 +28,14 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
               android:id="@+id/queue">
     </ListView>
 
+    <TextView
+        android:id="@+id/queue_empty_message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/queue_empty"
+        android:visibility="gone"
+        android:fontFamily="sans-serif-light"
+        android:textSize="18sp"
+        android:gravity="center" />
+
 </LinearLayout>

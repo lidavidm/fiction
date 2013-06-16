@@ -86,7 +86,7 @@ public class LibraryActivity
         babSubtitle = (TextView) findViewById(R.id.bab_song_subtitle);
         babSubtitle.setSelected(true);
 
-        getActionBar().setSubtitle("Fiction Music");
+        getActionBar().setSubtitle("Library");
         getActionBar().setTitle("Songs");
 
         initializeBottomActionBar();

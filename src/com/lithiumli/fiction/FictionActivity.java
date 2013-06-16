@@ -119,6 +119,7 @@ abstract public class FictionActivity extends Activity
 
     public void initializeDrawer(boolean indicator) {
         mQueueListView = (ListView) findViewById(R.id.queue);
+        mQueueListView.setEmptyView(findViewById(R.id.queue_empty_message));
         mQueueListView.setFastScrollEnabled(true);
         mQueueListView.setFastScrollAlwaysVisible(true);
         mQueueListView.setOnItemClickListener(

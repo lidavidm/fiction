@@ -30,12 +30,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                       android:layout_width="match_parent"
                       android:layout_height="match_parent"
                       android:background="#99000000">
-            <com.lithiumli.fiction.ui.AlbumSwiper
-                android:id="@+id/cover_pager"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                />
 
             <TextView android:id="@+id/np_song_name"
                       android:text="Song Name"
@@ -43,6 +37,9 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                       android:layout_height="wrap_content"
                       android:gravity="bottom"
                       style="@style/Title"
+                      android:layout_marginTop="?android:attr/actionBarSize"
+                      android:layout_marginRight="4dp"
+                      android:layout_marginLeft="4dp"
                       />
             <TextView android:id="@+id/np_song_album"
                       android:text="Album"
@@ -50,6 +47,8 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                       android:layout_height="wrap_content"
                       android:gravity="center_vertical"
                       style="@style/Subtitle"
+                      android:layout_marginRight="4dp"
+                      android:layout_marginLeft="4dp"
                       />
             <TextView android:id="@+id/np_song_artist"
                       android:text="Artist"
@@ -57,7 +56,20 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
                       android:layout_height="wrap_content"
                       android:gravity="top"
                       style="@style/Subtitle"
+                      android:layout_marginRight="4dp"
+                      android:layout_marginLeft="4dp"
                       />
+
+            <View android:layout_width="match_parent"
+                  android:layout_height="0dp"
+                  android:layout_weight="1" />
+
+            <com.lithiumli.fiction.ui.AlbumSwiper
+                android:id="@+id/cover_pager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="4"
+                />
 
             <LinearLayout android:layout_width="match_parent"
                           android:layout_height="wrap_content"
