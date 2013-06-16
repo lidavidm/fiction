@@ -34,6 +34,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.util.Log;
 
 import android.support.v4.view.ViewPager;
@@ -56,6 +57,7 @@ public class LibraryActivity
     TabsAdapter mTabsAdapter;
     TextView babSongTitle;
     TextView babSubtitle;
+    ImageView babCover;
     Crouton mCrouton;
     LinePageIndicator mIndicator;
 
@@ -83,8 +85,10 @@ public class LibraryActivity
         mViewPager.setCurrentItem(1);
 
         babSongTitle = (TextView) findViewById(R.id.bab_song_name);
+        babSongTitle.setSelected(true);
         babSubtitle = (TextView) findViewById(R.id.bab_song_subtitle);
         babSubtitle.setSelected(true);
+        babCover = (ImageView) findViewById(R.id.bab_cover);
 
         getActionBar().setSubtitle("Songs");
         getActionBar().setTitle("Library");
@@ -129,6 +133,7 @@ public class LibraryActivity
 
         babSongTitle.setText(song.getTitle());
         babSubtitle.setText(song.getArtist() + " - " + song.getAlbum());
+        babCover.setImageURI(song.getAlbumArt());
     }
 
     @Override
