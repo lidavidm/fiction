@@ -27,12 +27,8 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 		      android:layout_height="0dp"
               android:layout_weight="1"
               style="@style/ListItemTitle"
-              />
-
-	<TextView android:id="@+id/sub_text"
-		      android:layout_width="match_parent"
-		      android:layout_height="0dp"
-              android:layout_weight="1"
-              style="@style/ListItemSubtitle"
+              android:textSize="20sp"
+              android:paddingTop="4sp"
+              android:paddingBottom="4sp"
               />
 </LinearLayout>

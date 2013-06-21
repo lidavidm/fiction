@@ -34,6 +34,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -205,6 +206,13 @@ public class PlaylistsListFragment
                 cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Playlists.NAME));
 
             title.setText(name);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup parent) {
+            final View view = mInflater.inflate(R.layout.list_item_single,
+                                                parent, false);
+            return view;
         }
     }
 }

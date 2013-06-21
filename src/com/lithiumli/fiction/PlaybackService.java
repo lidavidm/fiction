@@ -293,6 +293,10 @@ public class PlaybackService
 
     public void queueChanged() {
         prepareNext();
+
+        if (mQueue.getCount() > 0) {
+            showNotification();
+        }
     }
 
     // PRIVATE INTERFACE
