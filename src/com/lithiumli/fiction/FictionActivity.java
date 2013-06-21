@@ -58,6 +58,7 @@ abstract public class FictionActivity extends Activity
     DrawerLayout mDrawer;
     ActionBarDrawerToggle mDrawerToggle;
     String mOldTitle;
+    String mOldSubtitle;
 
     PlaybackQueue.QueueAdapter mAdapter;
 
@@ -141,11 +142,13 @@ abstract public class FictionActivity extends Activity
                                                   R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close) {
                 public void onDrawerClosed(View view) {
                     getActionBar().setTitle(mOldTitle);
+                    getActionBar().setSubtitle(mOldSubtitle);
                     invalidateOptionsMenu();
                 }
 
                 public void onDrawerOpened(View drawerView) {
                     mOldTitle = (String) getActionBar().getTitle();
+                    mOldSubtitle = (String) getActionBar().getSubtitle();
                     getActionBar().setTitle("Queue");
                     invalidateOptionsMenu();
 
@@ -160,6 +163,11 @@ abstract public class FictionActivity extends Activity
                         if (queue.getCount() != 0) {
                             mQueueListView.setSelection(queue.getCurrentPosition());
                         }
+
+                        getActionBar().setSubtitle(
+                            String.format(
+                                getResources().getString(R.string.queue_count),
+                                queue.getCount()));
                     }
                 }
             };
