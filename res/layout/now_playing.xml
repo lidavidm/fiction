@@ -22,7 +22,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     android:layout_height="match_parent">
     <FrameLayout android:layout_width="match_parent"
                  android:layout_height="match_parent">
-        <ImageView android:id="@+id/background_image"
+        <uk.co.senab.bitmapcache.CacheableImageView android:id="@+id/background_image"
                    android:layout_width="match_parent"
                    android:layout_height="match_parent"
                    android:scaleType="centerCrop" />

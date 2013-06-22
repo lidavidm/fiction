@@ -1,3 +1,6 @@
 [submodule "Android-ViewPagerIndicator"]
 	path = Android-ViewPagerIndicator
 	url = git@github.com:JakeWharton/Android-ViewPagerIndicator.git
+[submodule "smoothie"]
+	path = smoothie
+	url = https://github.com/lucasr/smoothie

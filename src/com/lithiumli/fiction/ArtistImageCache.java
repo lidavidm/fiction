@@ -63,6 +63,7 @@ public class ArtistImageCache {
 
     public static ArtistImageCache getInstance(Context context) {
         if (mInstance == null) {
+            context = context.getApplicationContext(); // don't leak contexts
             mInstance = new ArtistImageCache(context);
         }
         return mInstance;
@@ -107,6 +108,18 @@ public class ArtistImageCache {
         mRequestQueue.add(req);
     }
 
+    public CacheableBitmapDrawable getImageBlocking(String artist) {
+        String key = ArtistImageCache.getCacheKey(artist);
+        android.util.Log.d("fiction", "Checking " + artist + " " + key);
+        return getCache().get(key);
+    }
+
+    public CacheableBitmapDrawable getImageMemory(String artist) {
+        String key = ArtistImageCache.getCacheKey(artist);
+        android.util.Log.d("fiction", "Checking " + artist + " " + key);
+        return getCache().getFromMemoryCache(key);
+    }
+
     public void storeImage(String key, Bitmap b) {
         new StoreCacheTask().execute(new StoreCacheParams(key, b));
     }
@@ -141,21 +154,21 @@ public class ArtistImageCache {
     }
 
     public static String getCacheKey(String artist) {
-        return artist;
+        // return artist;
         // https://gist.github.com/avilches/750151
-        // try {
-        //     MessageDigest md = MessageDigest.getInstance("SHA-256");
-        //     md.update(artist.getBytes());
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            md.update(artist.getBytes());
 
-        //     StringBuffer result = new StringBuffer();
-        //     for (byte byt : md.digest()) {
-        //         result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
-        //     }
-        //     return result.toString();
-        // }
-        // catch (NoSuchAlgorithmException e) {
-        // }
-        // return "";
+            StringBuffer result = new StringBuffer();
+            for (byte byt : md.digest()) {
+                result.append(Integer.toString((byt & 0xff) + 0x100, 16).substring(1));
+            }
+            return result.toString();
+        }
+        catch (NoSuchAlgorithmException e) {
+        }
+        return "";
     }
 
     public interface CacheCallback {
@@ -282,6 +295,7 @@ public class ArtistImageCache {
             Bitmap b = params[0].bitmap;
 
             getCache().put(key, b);
+            android.util.Log.d("fiction", "Storing " + key);
             return null;
         }
     }

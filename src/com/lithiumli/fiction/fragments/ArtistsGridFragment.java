@@ -28,12 +28,20 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.lucasr.smoothie.AsyncGridView;
+import org.lucasr.smoothie.ItemManager;
+import org.lucasr.smoothie.SimpleItemLoader;
+
+import uk.co.senab.bitmapcache.CacheableBitmapDrawable;
+
+import com.lithiumli.fiction.ArtistImageCache;
 import com.lithiumli.fiction.LibraryActivity;
 import com.lithiumli.fiction.R;
 import com.lithiumli.fiction.PlaybackQueue;
@@ -55,6 +63,13 @@ public class ArtistsGridFragment
             mAdapter = new ArtistsCursorAdapter(getActivity(), null, 0);
             getGridView().setAdapter(mAdapter);
         }
+
+        ImageLoader loader = new ImageLoader();
+        ItemManager.Builder builder = new ItemManager.Builder(loader);
+        builder.setPreloadItemsEnabled(true).setPreloadItemsCount(5);
+        builder.setThreadPoolSize(4);
+
+        ((AsyncGridView) getGridView()).setItemManager(builder.build());
     }
 
     public void onItemClick(AdapterView<?> parent, View view, int position, long
@@ -82,6 +97,9 @@ public class ArtistsGridFragment
                             parent) {
             final View view = mInflater.inflate(R.layout.grid_item_library,
                                                 parent, false);
+            ViewHolder holder = new ViewHolder();
+            holder.image = (ImageView) view.findViewById(R.id.artist_image);
+            view.setTag(holder);
             return view;
         }
 
@@ -94,6 +112,48 @@ public class ArtistsGridFragment
         @Override
         public Cursor swapCursor(Cursor c) {
             return super.swapCursor(c);
+        }
+
+        class ViewHolder {
+            public ImageView image;
+        }
+    }
+
+    class ImageLoader
+        extends SimpleItemLoader<String, CacheableBitmapDrawable> {
+        ArtistImageCache mCache;
+
+        public ImageLoader() {
+            mCache = ArtistImageCache.getInstance(getActivity());
+        }
+
+        public String getItemParams(Adapter adapter, int position) {
+            Cursor cursor = (Cursor) adapter.getItem(position);
+            if (cursor.moveToPosition(position)) {
+                return cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Artists.ARTIST));
+            }
+            return null;
+        }
+
+        @Override
+        public CacheableBitmapDrawable loadItem(String artist) {
+            if (artist == null) return null;
+            return mCache.getImageBlocking(artist);
+        }
+
+        @Override
+        public CacheableBitmapDrawable loadItemFromMemory(String artist) {
+            if (artist == null) return null;
+            return mCache.getImageMemory(artist);
+        }
+
+        @Override
+        public void displayItem(View itemView,
+                                CacheableBitmapDrawable result,
+                                boolean fromMemory) {
+            if (result != null) {
+                ((ArtistsCursorAdapter.ViewHolder) itemView.getTag()).image.setImageDrawable(result);
+            }
         }
     }
 }

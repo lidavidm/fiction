@@ -17,7 +17,7 @@ You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+              android:layout_height="@dimen/list_item_height"
               android:mode="twoLine"
               android:orientation="vertical"
               android:padding="@dimen/list_padding"
@@ -28,7 +28,7 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
               android:layout_weight="1"
               style="@style/ListItemTitle"
               android:textSize="20sp"
-              android:paddingTop="4sp"
-              android:paddingBottom="4sp"
+              android:paddingTop="@dimen/list_padding"
+              android:paddingBottom="@dimen/list_padding"
               />
 </LinearLayout>

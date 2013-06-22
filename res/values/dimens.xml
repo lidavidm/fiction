@@ -19,5 +19,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
     <dimen name="slidingmenu_shadow_width">25dp</dimen>
     <dimen name="slidingmenu_offset">100dp</dimen>
 
-    <dimen name="list_padding">4dp</dimen>
+    <dimen name="list_padding">6dp</dimen>
+    <dimen name="list_item_height">48dp</dimen>
 </resources>

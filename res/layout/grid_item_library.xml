@@ -17,11 +17,13 @@ You should have received a copy of the GNU General Public License along with
 Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
-              android:layout_height="wrap_content"
+              android:layout_height="96dp"
               android:orientation="horizontal"
               android:descendantFocusability="blocksDescendants">
-    <ImageView android:layout_width="match_parent"
-               android:layout_height="100dp" />
+    <ImageView android:id="@+id/artist_image"
+               android:layout_width="match_parent"
+               android:layout_height="match_parent"
+               android:scaleType="centerCrop" />
 	<TextView android:id="@+id/title_text"
 		      android:layout_width="match_parent"
 		      android:layout_height="match_parent"
@@ -29,5 +31,6 @@ Fiction Music.  If not, see <http://www.gnu.org/licenses/>. -->
               android:singleLine="true"
               android:textColor="#FFF"
               android:gravity="bottom"
+              android:textSize="16sp"
               />
 </FrameLayout>
