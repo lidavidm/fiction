@@ -1,0 +1,8 @@
+.tagline {
+  font-variant: small-caps;
+  /* text-rendering: auto; */
+}
+
+body {
+  font-family: Roboto, sans-serif;
+}
